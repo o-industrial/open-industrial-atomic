@@ -2,7 +2,6 @@
   "name": "@o-industrial/atomic",
   "version": "0.0.0",
   "exports": {
-    ".": "./mod.ts",
     "./atoms": "./src/atoms/.exports.ts",
     "./icons": "./build/iconset/icons/.exports.ts",
     "./molecules": "./src/molecules/.exports.ts",

@@ -38,7 +38,7 @@ export {
 export {
   type ResolvedImpulseContext,
   resolveImpulseContext,
-} from 'jsr:@o-industrial/common@0.0.475-integration/utils';
+} from 'jsr:@o-industrial/common@0.0.475-integration/utils/client';
 
 export { classSet, IS_BROWSER } from 'jsr:@fathym/atomic@0.0.184';
 
