@@ -49,9 +49,9 @@ export function CloudConnectAzureForm(
       let targetUrl: URL;
 
       try {
-        targetUrl = new URL(formAction, window.location.origin);
+        targetUrl = new URL(formAction, location.origin);
       } catch (_) {
-        targetUrl = new URL('/azure/oauth/signin', window.location.origin);
+        targetUrl = new URL('/azure/oauth/signin', location.origin);
       }
 
       if (!targetUrl.searchParams.has('success_url')) {
@@ -60,8 +60,8 @@ export function CloudConnectAzureForm(
 
       const width = 600;
       const height = 700;
-      const left = Math.max(0, Math.round((window.screen.width - width) / 2));
-      const top = Math.max(0, Math.round((window.screen.height - height) / 2));
+      const left = Math.max(0, Math.round((screen.width - width) / 2));
+      const top = Math.max(0, Math.round((screen.height - height) / 2));
 
       const features = [
         `width=${width}`,
@@ -76,14 +76,14 @@ export function CloudConnectAzureForm(
         'scrollbars=yes',
       ].join(',');
 
-      const popup = window.open(targetUrl.toString(), 'azure-oauth', features);
+      const popup = open(targetUrl.toString(), 'azure-oauth', features);
 
       if (popup) {
         popup.focus();
         return;
       }
 
-      window.location.href = targetUrl.toString();
+      location.href = targetUrl.toString();
     },
     [onSubmit, formAction, successPath],
   );

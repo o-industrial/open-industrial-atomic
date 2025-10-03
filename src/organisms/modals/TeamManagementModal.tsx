@@ -16,29 +16,40 @@ const friendlyDate = (joined?: string): string => {
 };
 
 const resolveJoined = (member: unknown): string | undefined => {
-  if (member && typeof member === 'object' && 'Joined' in (member as Record<string, unknown>)) {
+  if (
+    member &&
+    typeof member === 'object' &&
+    'Joined' in (member as Record<string, unknown>)
+  ) {
     const value = (member as { Joined?: string }).Joined;
     if (typeof value === 'string' && value.length > 0) return value;
   }
   return undefined;
 };
 
-export function TeamManagementModal(
-  { workspaceMgr, onClose }: TeamManagementModalProps,
-): JSX.Element {
+export function TeamManagementModal({
+  workspaceMgr,
+  onClose,
+}: TeamManagementModalProps): JSX.Element {
   const { currentWorkspace, teamMembers, inviteMember, removeMember } = workspaceMgr
     .UseWorkspaceSettings();
 
   const [email, setEmail] = useState('');
   const [inviting, setInviting] = useState(false);
   const [toast, setToast] = useState<
-    { message: string; kind: 'success' | 'error' | 'warning' } | null
+    {
+      message: string;
+      kind: 'success' | 'error' | 'warning';
+    } | null
   >(null);
   const [localMembers, setLocalMembers] = useState(teamMembers);
 
   useEffect(() => setLocalMembers(teamMembers), [teamMembers]);
 
-  const showToast = (message: string, kind: 'success' | 'error' | 'warning' = 'success') => {
+  const showToast = (
+    message: string,
+    kind: 'success' | 'error' | 'warning' = 'success',
+  ) => {
     setToast({ message, kind });
     setTimeout(() => setToast(null), 4000);
   };
@@ -54,8 +65,12 @@ export function TeamManagementModal(
               class={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-neon-violet-500/80 via-sky-500/70 to-cyan-400/80`}
             />
             <div class='space-y-1'>
-              <p class='text-xs font-semibold uppercase tracking-wide text-sky-300/90'>Workspace</p>
-              <h3 class='text-2xl font-semibold text-white'>{currentWorkspace.Details.Name}</h3>
+              <p class='text-xs font-semibold uppercase tracking-wide text-sky-300/90'>
+                Workspace
+              </p>
+              <h3 class='text-2xl font-semibold text-white'>
+                {currentWorkspace.Details.Name}
+              </h3>
               <p class='text-sm text-slate-300'>
                 Invite collaborators and keep membership aligned with your deployment cadence.
               </p>
@@ -68,7 +83,9 @@ export function TeamManagementModal(
             />
             <div class='flex items-center justify-between'>
               <h4 class='text-sm font-semibold text-white'>Current members</h4>
-              <span class='text-xs text-slate-400'>{localMembers.length} total</span>
+              <span class='text-xs text-slate-400'>
+                {localMembers.length} total
+              </span>
             </div>
 
             <div class='mt-3 space-y-2 max-h-64 overflow-y-auto'>
@@ -88,7 +105,9 @@ export function TeamManagementModal(
                     styleType={ActionStyleTypes.Outline}
                     onClick={async () => {
                       const username = member.Username;
-                      if (!confirm(`Remove ${username} from this workspace?`)) return;
+                      if (!confirm(`Remove ${username} from this workspace?`)) {
+                        return;
+                      }
                       try {
                         await removeMember(username);
                         setLocalMembers((prev) => prev.filter((m) => m.Username !== username));
@@ -117,7 +136,9 @@ export function TeamManagementModal(
               class={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-500/70 via-sky-500/70 to-cyan-400/70 opacity-80`}
             />
             <div class='space-y-3'>
-              <h4 class='text-sm font-semibold text-white'>Invite a new member</h4>
+              <h4 class='text-sm font-semibold text-white'>
+                Invite a new member
+              </h4>
               <div class='flex flex-wrap items-center gap-3'>
                 <Input
                   placeholder='Email'
@@ -135,17 +156,23 @@ export function TeamManagementModal(
                       showToast(`"${email}" is not a valid email`, 'warning');
                       return;
                     }
-                    const exists = localMembers.some((m) =>
-                      (m.Username ?? '').toLowerCase() === target
+                    const exists = localMembers.some(
+                      (m) => (m.Username ?? '').toLowerCase() === target,
                     );
                     if (exists) {
-                      showToast(`${target} is already on this workspace`, 'warning');
+                      showToast(
+                        `${target} is already on this workspace`,
+                        'warning',
+                      );
                       return;
                     }
                     try {
                       setInviting(true);
                       await inviteMember(email, 'Viewer', '');
-                      setLocalMembers((prev) => [...prev, { Username: target } as any]);
+                      setLocalMembers((prev) => [
+                        ...prev,
+                        { Username: target } as any,
+                      ]);
                       setEmail('');
                       showToast(`Invitation sent to ${target}`, 'success');
                     } catch (err) {
@@ -181,7 +208,13 @@ export function TeamManagementModal(
                   }`}
                 >
                   {toast.message}
-                  <button class='ml-3 underline' onClick={() => setToast(null)}>Dismiss</button>
+                  <Action
+                    styleType={ActionStyleTypes.Link}
+                    class='ml-3'
+                    onClick={() => setToast(null)}
+                  >
+                    Dismiss
+                  </Action>
                 </div>
               </div>
             </div>

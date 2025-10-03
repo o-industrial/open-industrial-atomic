@@ -133,7 +133,7 @@ export function CloudConnectionsModal({
     }
 
     const handleMessage = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin) {
+      if (event.origin !== location.origin) {
         return;
       }
 
@@ -158,10 +158,10 @@ export function CloudConnectionsModal({
       refreshAzureStatus();
     };
 
-    window.addEventListener('message', handleMessage);
+    addEventListener('message', handleMessage);
 
     return () => {
-      window.removeEventListener('message', handleMessage);
+      removeEventListener('message', handleMessage);
 
       if (authRefreshTimeout.current !== undefined) {
         clearTimeout(authRefreshTimeout.current);
@@ -194,12 +194,12 @@ export function CloudConnectionsModal({
       const redirectUrl = typeof data?.redirect === 'string' ? data.redirect : undefined;
 
       if (redirectUrl) {
-        window.location.href = redirectUrl;
+        location.href = redirectUrl;
         return;
       }
 
       if (data?.status?.ID) {
-        window.location.href = `/workspace/commit/${data.status.ID}`;
+        location.href = `/workspace/commit/${data.status.ID}`;
         return;
       }
 
@@ -494,7 +494,7 @@ export function CloudConnectionsModal({
                             clearTimeout(authRefreshTimeout.current);
                           }
 
-                          authRefreshTimeout.current = window.setTimeout(() => {
+                          authRefreshTimeout.current = setTimeout(() => {
                             authRefreshTimeout.current = undefined;
                             setAuthInFlight(false);
                             refreshAzureStatus();
@@ -520,7 +520,7 @@ export function CloudConnectionsModal({
                               <EaCSelectSubscriptionForm
                                 data-eac-bypass-base
                                 entLookup={entLookup}
-                                cloudLookup={''}
+                                cloudLookup=''
                               />
                             ),
                           },
@@ -531,7 +531,7 @@ export function CloudConnectionsModal({
                               <EaCCreateSubscriptionForm
                                 data-eac-bypass-base
                                 entLookup={entLookup}
-                                cloudLookup={''}
+                                cloudLookup=''
                               />
                             ),
                           },
@@ -543,7 +543,7 @@ export function CloudConnectionsModal({
                                 action='/workspace/api/o-industrial/eac/clouds'
                                 data-eac-bypass-base
                                 entLookup={entLookup}
-                                cloudLookup={''}
+                                cloudLookup=''
                               />
                             ),
                           },

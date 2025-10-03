@@ -31,7 +31,7 @@ export function ConnectionInfoPanel({
   const amqp = byPrefix('AMQP ');
   const http = byPrefix('HTTP ');
   // Exclude any service-level keys to avoid oversharing in the device panel
-  const service: [string, string][] = [];
+  const _service: [string, string][] = [];
   const identity = withoutPrefixes([
     'Device ',
     'MQTT ',

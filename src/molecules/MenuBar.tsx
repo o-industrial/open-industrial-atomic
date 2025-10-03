@@ -14,6 +14,7 @@ export function MenuBar({ menus, onMenuOption }: MenuBarProps): JSX.Element {
       {menus.map((m) => (
         <div key={m.id} class='-:relative'>
           <button
+            type='button'
             class={classSet([
               '-:px-1 -:py-0.5 -:text-neutral-300 -:hover:text-white',
               openId === m.id ? '-:underline' : '',

@@ -1,5 +1,5 @@
-import { IntentTypes, JSX } from '../../.deps.ts';
-import { getIntentStyles, IntentStyleMap } from '../../utils/getIntentStyles.ts';
+import { IntentStyleMap, IntentTypes, JSX } from '../../.deps.ts';
+import { getIntentStyles } from '../../utils/getIntentStyles.ts';
 
 export type ImpulseDetailTemplateProps = {
   name: string;

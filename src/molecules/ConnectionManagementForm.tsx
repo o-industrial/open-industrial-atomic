@@ -5,7 +5,6 @@ import {
   MultiProtocolIngestOption,
 } from '../.deps.ts';
 import { Input } from '../.exports.ts';
-import { MultiSelectCheckboxGroup } from './MultiSelectCheckboxGroup.tsx';
 
 type Props = {
   details: EaCAzureIoTHubDataConnectionDetails;
@@ -16,7 +15,7 @@ type Props = {
 export function ConnectionManagementForm({
   details,
   onChange,
-  ingestOptions,
+  ingestOptions: _,
 }: Props): JSX.Element {
   const handleStringChange =
     (key: keyof EaCAzureIoTHubDataConnectionDetails) =>
@@ -28,7 +27,7 @@ export function ConnectionManagementForm({
     (e: JSX.TargetedEvent<HTMLInputElement, Event>) =>
       onChange({ ...details, [key]: e.currentTarget.checked });
 
-  const handleProtocolsChange = (next: string[]) => {
+  const _handleProtocolsChange = (next: string[]) => {
     onChange({
       ...details,
       MultiProtocolIngest: next as MultiProtocolIngestOption[],

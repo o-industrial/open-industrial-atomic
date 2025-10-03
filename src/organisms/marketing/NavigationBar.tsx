@@ -41,7 +41,7 @@ export function MarketingNavigation({
   links,
   ctas = [],
   currentPath,
-  class: className,
+  class: _className,
   ...rest
 }: MarketingNavigationProps): JSX.Element {
   const [mobileOpen, setMobileOpen] = useState(false);

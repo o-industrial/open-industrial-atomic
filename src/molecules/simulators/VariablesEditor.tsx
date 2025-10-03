@@ -2,8 +2,6 @@ import { IntentTypes, JSX, useMemo, useState } from '../../.deps.ts';
 import { Input } from '../../atoms/forms/Input.tsx';
 import { Select } from '../../atoms/forms/Select.tsx';
 import { Action, ActionStyleTypes } from '../../atoms/Action.tsx';
-import { UndoIcon } from '../../../build/iconset/icons/UndoIcon.tsx';
-import { RedoIcon } from '../../../build/iconset/icons/RedoIcon.tsx';
 import { DeleteIcon } from '../../../build/iconset/icons/DeleteIcon.tsx';
 
 type VariableDef = {
@@ -101,7 +99,7 @@ export function VariablesEditor({ value, onChange }: Props): JSX.Element {
     update(next);
   };
 
-  const moveVar = (idx: number, dir: -1 | 1) => {
+  const _moveVar = (idx: number, dir: -1 | 1) => {
     const next = vars.slice();
     const j = idx + dir;
     if (j < 0 || j >= next.length) return;

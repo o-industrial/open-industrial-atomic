@@ -16,7 +16,7 @@ export function WorkspaceSettingsModal({
     .UseWorkspaceSettings();
 
   const { Modal: teamModal, Show: showTeamModal } = TeamManagementModal.Modal(workspaceMgr);
-  const { Modal: mngWkspcsModal, Show: showMngWkspcs } = ManageWorkspacesModal.Modal(workspaceMgr);
+  const { Modal: mngWkspcsModal, Show: _showMngWkspcs } = ManageWorkspacesModal.Modal(workspaceMgr);
 
   const details: EaCEnterpriseDetails = currentWorkspace.Details;
 

@@ -1,3 +1,4 @@
+// deno-lint-ignore-file jsx-no-useless-fragment
 import {
   AIMessage,
   AIMessageChunk,
@@ -12,7 +13,6 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState,
   WorkspaceManager,
 } from '../.deps.ts';
 

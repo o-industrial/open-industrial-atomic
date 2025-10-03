@@ -107,8 +107,8 @@ export function APIKeysModal({ workspaceMgr, onClose }: APIKeysModalProps): JSX.
   useEffect(() => {
     if (copyState !== 'copied') return;
 
-    const timeout = window.setTimeout(() => setCopyState('idle'), 2000);
-    return () => window.clearTimeout(timeout);
+    const timeout = setTimeout(() => setCopyState('idle'), 2000);
+    return () => clearTimeout(timeout);
   }, [copyState]);
 
   const activePreset = durationPresets.find((preset) => preset.value === minutes);

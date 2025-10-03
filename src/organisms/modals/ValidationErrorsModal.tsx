@@ -1,7 +1,11 @@
 import { Modal } from '../../.exports.ts';
-import type { FunctionalComponent, JSX } from 'npm:preact@10.20.1';
+import type { FunctionalComponent } from 'npm:preact@10.20.1';
 
-export type ValidationIssue = { code?: string; field?: string; message: string };
+export type ValidationIssue = {
+  code?: string;
+  field?: string;
+  message: string;
+};
 export type ValidationErrorEntry = {
   node: { ID: string; Type: string; Label?: string };
   issues: ValidationIssue[];
@@ -12,7 +16,10 @@ type Props = {
   onClose: () => void;
 };
 
-export const ValidationErrorsModal: FunctionalComponent<Props> = ({ errors, onClose }) => {
+export const ValidationErrorsModal: FunctionalComponent<Props> = ({
+  errors,
+  onClose,
+}) => {
   return (
     <Modal title='Validation Errors' onClose={onClose}>
       <div class='space-y-4'>

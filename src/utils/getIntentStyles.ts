@@ -1,4 +1,4 @@
-import { IntentTypes, IntentStyleMap } from '../.deps.ts';
+import { IntentStyleMap, IntentTypes } from '../.deps.ts';
 
 export const intentStyleMap: Record<IntentTypes, IntentStyleMap> = {
   [IntentTypes.Primary]: {

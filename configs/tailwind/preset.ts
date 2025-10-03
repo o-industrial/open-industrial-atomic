@@ -144,4 +144,3 @@ const preset: Config = {
 
 export const openIndustrialTailwindPreset = preset;
 export default preset;
-

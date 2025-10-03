@@ -16,13 +16,7 @@ import {
   useState,
   WorkspaceManager,
 } from '../.deps.ts';
-import {
-  FlowControls,
-  LoadingSpinner,
-  ManagementControls,
-  neonColors,
-  SystemControls,
-} from '../.exports.ts';
+import { FlowControls, LoadingSpinner, ManagementControls, neonColors } from '../.exports.ts';
 import { FlowPanelBank } from '../molecules/flows/FlowPanelBank.tsx';
 import { ValidationErrorsModal } from './modals/ValidationErrorsModal.tsx';
 import { FlowPanelTemplate } from '../templates/FlowPanelTemplate.tsx';
@@ -36,7 +30,7 @@ type FlowPanelProps = {
 
 function FlowPanelInner({
   workspaceMgr,
-  onShowSimulatorLibrary,
+  onShowSimulatorLibrary: _,
 }: FlowPanelProps): JSX.Element {
   const [showMap, setShowMap] = useState(false);
   const { screenToFlowPosition } = useReactFlow();

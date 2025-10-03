@@ -1,4 +1,4 @@
-import { BaseMessage, classSet, ComponentChildren, IntentTypes, JSX } from '../../.deps.ts';
+import { classSet, ComponentChildren, IntentTypes, JSX } from '../../.deps.ts';
 import { Badge } from '../../.exports.ts';
 
 export type AziChatMessageProps = {

@@ -109,7 +109,8 @@ export function EaCCreateSubscriptionForm(
             <option value='' disabled>
               {loading ? 'Loading scopes...' : 'Choose a billing scope'}
             </option>
-            {sortedScopes.map((scope) => <option value={scope.id}>{scope.label}</option>)}
+            {sortedScopes.map((scope, i) => <option value={scope.id} key={i}>{scope.label}
+            </option>)}
           </Select>
           {error && <p class='mt-1 text-xs text-rose-300'>{error}</p>}
           {!loading && !error && sortedScopes.length === 0 && (

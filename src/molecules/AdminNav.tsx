@@ -25,8 +25,8 @@ export function AdminNav({
 
   useEffect(() => {
     const onPop = () => setPath(location.pathname);
-    window.addEventListener('popstate', onPop);
-    return () => window.removeEventListener('popstate', onPop);
+    addEventListener('popstate', onPop);
+    return () => removeEventListener('popstate', onPop);
   }, []);
 
   const linkCls = (isActive: boolean) =>

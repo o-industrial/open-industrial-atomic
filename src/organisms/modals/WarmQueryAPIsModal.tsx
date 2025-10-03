@@ -88,7 +88,7 @@ export function WarmQueryAPIsModal({
     }`;
     return raw.startsWith('/') ? raw : `/${raw}`;
   }, [selected]);
-  const origin = IS_BROWSER ? window.location.origin : HOST_PLACEHOLDER;
+  const origin = IS_BROWSER ? location.origin : HOST_PLACEHOLDER;
   const endpointUrl = selected ? `${origin}${endpointPath}` : '';
 
   const curlSnippet = useMemo(() => {

@@ -84,6 +84,7 @@ export function FlyoutMenu({
         const item = n as MenuActionItem;
         return (
           <button
+            type='button'
             key={item.id}
             role='menuitem'
             disabled={item.disabled}
@@ -133,15 +134,14 @@ function SubmenuRow({
       </div>
 
       {/* nested */}
-      <div
-        ref={flyRef}
-        class='-:absolute -:top-0 -:left-full -:ml-1'
-      >
+      <div ref={flyRef} class='-:absolute -:top-0 -:left-full -:ml-1'>
         <FlyoutMenu
           items={node.items}
           level={1}
           onPick={onPick}
-          onRequestClose={() => {/* submenu closes with parent */}}
+          onRequestClose={() => {
+            /* submenu closes with parent */
+          }}
         />
       </div>
     </div>

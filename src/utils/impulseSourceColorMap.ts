@@ -1,4 +1,4 @@
-import { RuntimeImpulseSources, IntentStyleMap } from '../.deps.ts';
+import { IntentStyleMap, RuntimeImpulseSources } from '../.deps.ts';
 
 export const impulseSourceColorMap: Record<
   RuntimeImpulseSources,

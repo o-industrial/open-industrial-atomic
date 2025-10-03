@@ -1,12 +1,11 @@
 import {
   EverythingAsCodeOIWorkspace,
+  IntentStyleMap,
   JSX,
-  type ResolvedImpulseContext,
   resolveImpulseContext,
   type RuntimeImpulse,
 } from '../../.deps.ts';
 import { ImpulseDetailTemplate } from './ImpulseDetailTemplate.tsx';
-import { IntentStyleMap } from '../../utils/getIntentStyles.ts';
 
 export function ImpulseEntry(props: {
   impulse: RuntimeImpulse;

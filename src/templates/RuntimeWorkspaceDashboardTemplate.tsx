@@ -1,3 +1,4 @@
+// deno-lint-ignore-file jsx-no-useless-fragment
 import { classSet, IntentTypes, JSX, useEffect, useState } from '../.deps.ts';
 import { Action, ActionStyleTypes, CloseIcon, ExpandIcon, PanelShell } from '../.exports.ts';
 

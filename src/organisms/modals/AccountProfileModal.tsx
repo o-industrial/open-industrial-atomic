@@ -195,7 +195,7 @@ function AccountInfoTab({
   );
 }
 
-function TeamsTab({
+function _TeamsTab({
   teams,
   onUpdateRole,
   onLeave,
@@ -247,7 +247,7 @@ function TeamsTab({
   );
 }
 
-function DangerZoneTab({ onDelete }: { onDelete: () => void }) {
+function _DangerZoneTab({ onDelete }: { onDelete: () => void }) {
   return (
     <div class='space-y-4'>
       <div class='border border-red-500/30 rounded p-4 bg-red-500/5'>

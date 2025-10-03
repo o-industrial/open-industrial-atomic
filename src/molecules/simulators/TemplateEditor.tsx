@@ -61,7 +61,7 @@ function buildObject(fields: Field[]): JSONObject {
       case 'number':
       case 'boolean':
       case 'null':
-        obj[f.key] = f.value as any;
+        obj[f.key] = f.value;
         break;
       case 'variable':
         obj[f.key] = `$.${(f.value as { ref: string }).ref}`;
@@ -341,7 +341,7 @@ function SubObjectEditor(
         case 'number':
         case 'boolean':
         case 'null':
-          acc[f.key] = f.value as any;
+          acc[f.key] = f.value;
           break;
         case 'variable':
           acc[f.key] = `$.${(f.value as { ref: string }).ref}`;

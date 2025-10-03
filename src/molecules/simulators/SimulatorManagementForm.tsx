@@ -21,7 +21,7 @@ export function SimulatorManagementForm({
       onChange({ [key]: v === '' ? undefined : Number(v) });
     };
 
-  const handleJsonChange =
+  const _handleJsonChange =
     (key: keyof EaCAzureDockerSimulatorDetails) =>
     (e: JSX.TargetedEvent<HTMLTextAreaElement, Event>) => {
       const raw = e.currentTarget.value;
