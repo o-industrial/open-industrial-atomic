@@ -1,8 +1,16 @@
 {
-  "name": "@aaa_bbb_ccc/www_xxx_yyy_zzz",
+  "name": "@o-industrial/atomic",
   "version": "0.0.0",
   "exports": {
-    ".": "./mod.ts"
+    ".": "./mod.ts",
+    "./atoms": "./src/atoms/.exports.ts",
+    "./icons": "./build/iconset/icons/.exports.ts",
+    "./molecules": "./src/molecules/.exports.ts",
+    "./organisms": "./src/organisms/.exports.ts",
+    "./templates": "./src/templates/.exports.ts",
+    "./tailwind/preset": "./configs/tailwind/preset.ts",
+    "./tailwind/preset.ts": "./configs/tailwind/preset.ts",
+    "./utils": "./src/utils/.exports.ts"
   },
   "license": "MIT",
   "tasks": {
@@ -15,37 +23,24 @@
     "test": "npx rimraf cov && deno test -A ./tests/tests.ts --coverage=cov",
     "version": "deno run -A jsr:@fathym/common@0.2.267/build/version"
   },
-  "imports": {},
-  "exclude": [
-    "**/_eac-runtime/*",
-    "!src/**/.exports.ts",
-    "!mod.ts"
-  ],
+  "imports": {
+    "jsr:@o-industrial/common@0.0.473-integration/eac": "../open-industrial-reference-architecture/src/eac/.exports.ts",
+    "jsr:@o-industrial/common@0.0.473-integration/flow": "../open-industrial-reference-architecture/src/flow/.exports.ts",
+    "jsr:@o-industrial/common@0.0.473-integration/types": "../open-industrial-reference-architecture/src/types/.exports.ts",
+    "jsr:@o-industrial/common@0.0.473-integration/utils": "../open-industrial-reference-architecture/src/utils/.exports.ts"
+  },
+  "exclude": ["**/_eac-runtime/*", "!src/**/.exports.ts", "!mod.ts"],
   "lint": {
-    "include": [
-      "apps/",
-      "configs/",
-      "src/",
-      "tests/"
-    ],
+    "include": ["apps/", "configs/", "src/", "tests/"],
     "exclude": [],
     "rules": {
-      "tags": [
-        "recommended"
-      ],
-      "include": [
-        "ban-untagged-todo"
-      ],
+      "tags": ["recommended"],
+      "include": ["ban-untagged-todo"],
       "exclude": []
     }
   },
   "fmt": {
-    "include": [
-      "apps/",
-      "configs/",
-      "src/",
-      "tests/"
-    ],
+    "include": ["apps/", "configs/", "src/", "tests/"],
     "exclude": [],
     "indentWidth": 2,
     "lineWidth": 100,
@@ -54,8 +49,10 @@
     "singleQuote": true,
     "useTabs": false
   },
-  "unstable": [
-    "kv"
-  ],
-  "lock": false
+  "unstable": ["kv"],
+  "lock": false,
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "npm:preact@10.20.1"
+  }
 }
