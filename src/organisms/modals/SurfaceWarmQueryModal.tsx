@@ -102,7 +102,14 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
   const lastAppendedDataQueryRef = useRef<string | undefined>(undefined);
 
   const onAziStateChange = (state: AziState) => {
-    // Ignore hydrated errors from initial Peek; only append during an active send
+    try {
+      const dq = (state as any)?.DataQuery as string | undefined;
+      const cq = (state as any)?.CurrentQuery as string | undefined;
+      if (dq && dq !== cq) {
+        setQuery(dq);
+        setActiveTabKey('query');
+      }
+    } catch {}
     if (!isLoading) return;
 
     const err = (state as any)?.Error;
@@ -236,7 +243,7 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
     <Modal
       title={`Query: ${queryName}`}
       onClose={onClose}
-      class='max-w-[1200px] border border-neutral-700 bg-neutral-900'
+      class='w-full max-w-[1200px] border border-neutral-700 bg-neutral-900'
       style={{ height: '90vh' }}
     >
       <div
@@ -290,7 +297,7 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
         </div>
 
         {/* Right Side: AziPanel */}
-        <div class='w-1/3 border-l border-gray-700 pl-4 overflow-y-auto'>
+        <div class='w-1/3 min-h-0 border-l border-gray-700 pl-4'>
           <AziPanel
             workspaceMgr={workspace}
             onStartSend={onAziStartSend}
