@@ -7,7 +7,7 @@ export {
   type EverythingAsCodeOIWorkspace,
   type MultiProtocolIngestOption,
   type SurfaceDataConnectionSettings,
-} from 'jsr:@o-industrial/common@0.0.475-integration/eac';
+} from 'jsr:@o-industrial/common@0.0.477/eac';
 
 export {
   AziManager,
@@ -22,7 +22,7 @@ export {
   type SimulatorPackDefinition,
   WorkspaceManager,
   type WorkspaceSummary,
-} from 'jsr:@o-industrial/common@0.0.475-integration/flow';
+} from 'jsr:@o-industrial/common@0.0.477/flow';
 
 export {
   type AccountProfile,
@@ -33,12 +33,12 @@ export {
   type RuntimeImpulse,
   type RuntimeImpulseSources,
   type TeamMembership,
-} from 'jsr:@o-industrial/common@0.0.475-integration/types';
+} from 'jsr:@o-industrial/common@0.0.477/types';
 
 export {
   type ResolvedImpulseContext,
   resolveImpulseContext,
-} from 'jsr:@o-industrial/common@0.0.475-integration/utils/client';
+} from 'jsr:@o-industrial/common@0.0.477/utils/client';
 
 export { classSet, IS_BROWSER } from 'jsr:@fathym/atomic@0.0.184';
 
