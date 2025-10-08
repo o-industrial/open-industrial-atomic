@@ -1,5 +1,5 @@
 import { IntentTypes, JSX, useEffect, useRef, useState } from '../../.deps.ts';
-import { Action, ActionStyleTypes, Input, SendIcon, EmptyIcon } from '../../.exports.ts';
+import { Action, ActionStyleTypes, Input, SendIcon, RedoIcon } from '../../.exports.ts';
 
 export type AziChatInputProps = {
   placeholder?: string;
@@ -8,7 +8,7 @@ export type AziChatInputProps = {
   inputIntentType?: IntentTypes;
   actionIntentType?: IntentTypes;
   sendIcon?: JSX.Element;
-  resetIcon?: JSX.Element;
+  redoIcon?: JSX.Element;
   maxHeight?: number; // in pixels
   extraInputs?: Record<string, unknown>;
   onReset?: () => void | Promise<void>;
@@ -21,7 +21,7 @@ export function AziChatInput({
   inputIntentType = IntentTypes.None,
   actionIntentType = IntentTypes.Primary,
   sendIcon = <SendIcon class='w-5 h-5' />,
-  resetIcon = <EmptyIcon class="w-5 h-5" />,
+  redoIcon = <RedoIcon class="w-5 h-5" />,
   maxHeight = 50,
   extraInputs = {},
   onReset
@@ -121,13 +121,13 @@ export function AziChatInput({
                 (result as Promise<void>).catch(() => {});
               }
             }}
-            styleType={ActionStyleTypes.Outline | ActionStyleTypes.Thin}
-            intentType={IntentTypes.Secondary}
+            styleType={ActionStyleTypes.Solid | ActionStyleTypes.Thin}
+            intentType={IntentTypes.Primary}
             disabled={isDisabled}
             class="text-xs px-3"
-            title="Reset"
+            title="Reset Chat"
           >
-            {resetIcon}
+            {redoIcon}
           </Action>
         )}
       </div>
