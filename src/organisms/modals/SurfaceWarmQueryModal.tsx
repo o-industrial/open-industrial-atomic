@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import { marked } from 'npm:marked@15.0.1';
-import { useEffect, useRef, useState } from 'npm:preact@10.20.1/hooks';
+import { useEffect, useMemo, useRef, useState } from 'npm:preact@10.20.1/hooks';
 import type { FunctionalComponent } from 'npm:preact@10.20.1';
 import { SurfaceWarmQueryModalQuery } from './SurfaceWarmQueryModalQuery.tsx';
 import { SurfaceWarmQueryModalResults } from './SurfaceWarmQueryModalResults.tsx';
@@ -9,6 +9,21 @@ import { AziPanel } from '../AziPanel.tsx';
 import { Modal } from '../../molecules/Modal.tsx';
 import { TabbedPanel } from '../../molecules/TabbedPanel.tsx';
 import { Action } from '../../atoms/Action.tsx';
+
+const shaHash = async (workspaceLookup: string, id: string): Promise<string> => {
+  if (!workspaceLookup || !id) return id;
+  const subtle = globalThis.crypto?.subtle;
+  if (!subtle) return id;
+  try {
+    const encoded = new TextEncoder().encode(`${workspaceLookup}:${id}`);
+    const digest = await subtle.digest('SHA-256', encoded);
+    return Array.from(new Uint8Array(digest))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+  } catch {
+    return id;
+  }
+};
 
 interface SurfaceWarmQueryModalProps {
   workspace: WorkspaceManager;
@@ -31,12 +46,16 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
   aziExtraInputs,
   warmQueryLookup,
 }) => {
+  const userEditedRef = useRef(false);
+  const autoAppliedQueryRef = useRef<string | null>(null);
   const [query, setQuery] = useState(initialQuery);
   type QueryResultRow = Record<string, unknown>;
   const [queryResults, setQueryResults] = useState<QueryResultRow[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTabKey, setActiveTabKey] = useState('query');
   const [errors, setErrors] = useState('');
+  const eac = workspace.UseEaC();
+  const [defaultDeviceIds, setDefaultDeviceIds] = useState<string[]>([]);
 
   const isRunDisabled = !query || isLoading;
 
@@ -83,6 +102,8 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
 
     streamBaselineDataQueryRef.current = next;
     setQuery(next);
+    userEditedRef.current = true;
+    autoAppliedQueryRef.current = null;
     if (activeTabKey !== 'results') {
       setActiveTabKey('query');
     }
@@ -116,6 +137,8 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
       lastAppendedDataQueryRef.current = undefined;
       isAziStreamingRef.current = false;
       streamBaselineDataQueryRef.current = undefined;
+      userEditedRef.current = false;
+      autoAppliedQueryRef.current = null;
     } catch (err) {
       console.log(err);
     }
@@ -216,6 +239,79 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
     setErrors('');
   }, []);
 
+  const connectionLookups = useMemo(() => {
+    if (!eac?.Surfaces) return [] as string[];
+    for (const surface of Object.values(eac.Surfaces)) {
+      const warmSettings = surface?.WarmQueries?.[warmQueryLookup];
+      if (!warmSettings) continue;
+      const dedup = new Set<string>();
+      for (const raw of warmSettings.DataConnectionLookups ?? []) {
+        if (!raw) continue;
+        const trimmed = raw.trim();
+        if (!trimmed) continue;
+        const idx = trimmed.lastIndexOf('->');
+        const parsed = idx >= 0 ? trimmed.slice(idx + 2).trim() : trimmed;
+        if (parsed) dedup.add(parsed);
+      }
+      return Array.from(dedup);
+    }
+    return [] as string[];
+  }, [eac, warmQueryLookup]);
+
+  const hasDataConnections = connectionLookups.length > 0;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!hasDataConnections || !eac?.EnterpriseLookup) {
+      setDefaultDeviceIds([]);
+      return;
+    }
+
+    (async () => {
+      try {
+        const hashed = await Promise.all(
+          connectionLookups.map((lookup) => shaHash(eac.EnterpriseLookup as string, lookup)),
+        );
+        const distinct = Array.from(new Set(hashed.filter(Boolean)));
+        if (!cancelled) {
+          setDefaultDeviceIds(distinct);
+        }
+      } catch {
+        if (!cancelled) {
+          setDefaultDeviceIds([]);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [connectionLookups, hasDataConnections, eac?.EnterpriseLookup]);
+
+  useEffect(() => {
+    if (userEditedRef.current) return;
+
+    const baseDefault = 'Devices\n| take 10';
+    const deviceDefault = defaultDeviceIds.length
+      ? `Devices\n| where DeviceID in (${defaultDeviceIds.map((id) => `"${id}"`).join(', ')})\n| take 10`
+      : baseDefault;
+    const nextDefault = hasDataConnections ? deviceDefault : baseDefault;
+    const shouldApply = query.trim().length === 0 || autoAppliedQueryRef.current === query;
+
+    if (!shouldApply) return;
+    if (query === nextDefault) {
+      autoAppliedQueryRef.current = nextDefault;
+      return;
+    }
+
+    autoAppliedQueryRef.current = nextDefault;
+    setQuery(nextDefault);
+  }, [defaultDeviceIds, hasDataConnections, query]);
+
+  const coerceQueryValue = (val: string | { currentTarget?: { value?: string } }): string =>
+    typeof val === 'string' ? val : val?.currentTarget?.value ?? '';
+
   const tabData = [
     {
       key: 'query',
@@ -234,11 +330,10 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
         <SurfaceWarmQueryModalQuery
           query={query}
           onQueryChange={(val) => {
-            setQuery(
-              typeof val === 'string' ? val : (val as any).currentTarget?.value ?? '',
-            );
-            // Normalize string value for persistence
-            const next = typeof val === 'string' ? val : (val as any).currentTarget?.value ?? '';
+            userEditedRef.current = true;
+            autoAppliedQueryRef.current = null;
+            const next = coerceQueryValue(val as any);
+            setQuery(next);
             persistQuery(next);
           }}
           errors={errors}
