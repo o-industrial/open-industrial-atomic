@@ -41,6 +41,8 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
   const isRunDisabled = !query || isLoading;
 
   const seenFirstErrorRef = useRef(false);
+  const isAziStreamingRef = useRef(false);
+  const streamBaselineDataQueryRef = useRef<string | undefined>(undefined);
 
   // Debounced persistence of Query edits back to EaC so main Save commits them
   const persistTimerRef = useRef<number | null>(null);
@@ -72,13 +74,32 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  const onAziFinishSend = (state: AziState) => {
+  const applyAziDataQuery = (next?: string) => {
+    if (!next) return;
+    const baseline = streamBaselineDataQueryRef.current;
+    if (baseline !== undefined && baseline === next) {
+      return;
+    }
+
+    streamBaselineDataQueryRef.current = next;
+    setQuery(next);
+    if (activeTabKey !== 'results') {
+      setActiveTabKey('query');
+    }
+  };
+
+  const onAziFinishSend = (state?: AziState) => {
+    const wasStreaming = isAziStreamingRef.current;
+    isAziStreamingRef.current = false;
     setIsLoading(false);
-    if (state && state.DataQuery && state.DataQuery != state.CurrentQuery) {
-      setQuery(state.DataQuery as string);
-      if (activeTabKey !== 'results') {
-        setActiveTabKey('query');
-      }
+    if (
+      wasStreaming &&
+      state &&
+      state.DataQuery &&
+      state.DataQuery != state.CurrentQuery
+    ) {
+      const nextQuery = typeof state.DataQuery === 'string' ? state.DataQuery : undefined;
+      applyAziDataQuery(nextQuery);
     }
 
     // Append final banner without overwriting any streamed error history
@@ -93,6 +114,8 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
       lastAppendedErrorRef.current = undefined;
       lastAppendedErrorCodeRef.current = undefined;
       lastAppendedDataQueryRef.current = undefined;
+      isAziStreamingRef.current = false;
+      streamBaselineDataQueryRef.current = undefined;
     } catch (err) {
       console.log(err);
     }
@@ -107,11 +130,8 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
     try {
       const dq = (state as any)?.DataQuery as string | undefined;
       const cq = (state as any)?.CurrentQuery as string | undefined;
-      if (dq && dq !== cq) {
-        setQuery(dq);
-        if (activeTabKey !== 'results') {
-          setActiveTabKey('query');
-        }
+      if (isAziStreamingRef.current && dq && dq !== cq) {
+        applyAziDataQuery(dq);
       }
     } catch {}
     if (!isLoading) return;
@@ -133,7 +153,10 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
 
     setErrors((prev) => {
       const lead = prev ? prev + '\n\n' : '';
-      setQuery(dataQuery);
+      if (isAziStreamingRef.current) {
+        const nextQuery = typeof dataQuery === 'string' ? dataQuery : undefined;
+        applyAziDataQuery(nextQuery);
+      }
       if (!seenFirstErrorRef.current) {
         // First error of this run: plain
         seenFirstErrorRef.current = true;
@@ -149,7 +172,10 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
     });
   };
 
-  const onAziStartSend = () => {
+  const onAziStartSend = (initialState?: AziState) => {
+    const initialDataQuery = (initialState as any)?.DataQuery as string | undefined;
+    streamBaselineDataQueryRef.current = initialDataQuery ?? undefined;
+    isAziStreamingRef.current = true;
     setIsLoading(true);
     setActiveTabKey('query');
     setErrors('> Azi Thinking...');
@@ -160,6 +186,8 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
   };
 
   const handleRunClick = async () => {
+    isAziStreamingRef.current = false;
+    streamBaselineDataQueryRef.current = undefined;
     setActiveTabKey('query');
     setErrors('> Executing Query...');
     setIsLoading(true);

@@ -28,8 +28,8 @@ type AziPanelProps = {
   workspaceMgr: WorkspaceManager;
   aziMgr: AziManager;
   onClose?: () => void;
-  onStartSend?: (state: AziState) => void;
-  onFinishSend?: (state: AziState) => void;
+  onStartSend?: (state?: AziState) => void;
+  onFinishSend?: (state?: AziState) => void;
   onStateChange?: (state: AziState) => void;
   intentTypes?: Partial<Record<Role, IntentTypes>>;
   renderMessage?: (message: string) => string;
@@ -281,3 +281,4 @@ export function AziPanel({
     </AziPanelTemplate>
   );
 }
+
