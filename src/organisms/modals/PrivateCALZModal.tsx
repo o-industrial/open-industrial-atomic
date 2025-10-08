@@ -1,4 +1,4 @@
-import { JSX, useEffect, useState, WorkspaceManager } from '../../.deps.ts';
+import { IntentTypes, JSX, useEffect, useState, WorkspaceManager } from '../../.deps.ts';
 import { Action, LoadingIcon, Modal } from '../../.exports.ts';
 import { ActionStyleTypes } from '../../atoms/Action.tsx';
 
@@ -70,6 +70,189 @@ const calzHighlights: CalzHighlight[] = [
     ),
   },
 ];
+
+type CapabilityPromo = {
+  name: string;
+  tagline: string;
+  description: string;
+  topAccent: string;
+  iconAccent: string;
+  icon: JSX.Element;
+  actions: Array<{
+    label: string;
+    intent: IntentTypes;
+    href: string;
+    outline?: boolean;
+  }>;
+};
+
+const capabilityPromos: CapabilityPromo[] = [
+  {
+    name: 'HighByte',
+    tagline: 'Industrial DataOps, ready for your floor',
+    description:
+      'HighByte brings contextualized DataOps to the edge. Deploy it on your infrastructure to model operations data now and stream enriched context into Open Industrial once your workspace cloud is linked.',
+    topAccent: 'from-emerald-500/70 via-sky-500/70 to-cyan-400/70',
+    iconAccent: 'from-emerald-500 via-sky-500 to-emerald-400',
+    icon: <span class='text-sm font-semibold tracking-wide text-white'>HB</span>,
+    actions: [
+      {
+        label: 'Deploy',
+        intent: IntentTypes.Primary,
+        href: 'mailto:support@fathym.com?subject=Deploy%20HighByte%20on%20my%20metal',
+      },
+      {
+        label: 'Connect',
+        intent: IntentTypes.Info,
+        href: 'mailto:support@fathym.com?subject=Connect%20HighByte%20to%20Open%20Industrial',
+        outline: true,
+      },
+    ],
+  },
+  {
+    name: 'NodeRed',
+    tagline: 'Flow-based orchestration at the edge',
+    description:
+      'Node-RED lets you wire devices, services, and APIs with drag-and-drop flows. Stand it up on your metal, automate processes locally, and be ready to register those flows with CALZ once the workspace cloud comes online.',
+    topAccent: 'from-fuchsia-500/70 via-violet-500/70 to-sky-500/70',
+    iconAccent: 'from-rose-500 via-red-500 to-orange-500',
+    icon: (
+      <svg viewBox='0 0 32 32' class='h-6 w-6 text-white'>
+        <path
+          d='M10 10a2 2 0 0 1 4 0v2h4a2 2 0 1 1 0 4h-1.5a2.5 2.5 0 1 1-5 0H10a2 2 0 1 1 0-4h1.5V10Z'
+          fill='currentColor'
+        />
+        <circle cx='21.5' cy='16' r='1.5' fill='currentColor' />
+        <circle cx='10' cy='14' r='1.5' fill='currentColor' />
+      </svg>
+    ),
+    actions: [
+      {
+        label: 'Deploy',
+        intent: IntentTypes.Primary,
+        href: 'mailto:support@fathym.com?subject=Deploy%20Node-RED%20on%20my%20metal',
+      },
+      {
+        label: 'Connect',
+        intent: IntentTypes.Info,
+        href: 'mailto:support@fathym.com?subject=Connect%20Node-RED%20to%20Open%20Industrial',
+        outline: true,
+      },
+    ],
+  },
+  {
+    name: 'PowerBI',
+    tagline: 'Analytics that meet your operators where they work',
+    description:
+      'Power BI dashboards turn edge data into business intelligence. Spin up local gateways, craft reports, and when the workspace cloud is ready, plug them into Open Industrial for governed sharing.',
+    topAccent: 'from-amber-400/70 via-orange-400/70 to-pink-400/70',
+    iconAccent: 'from-amber-400 via-yellow-400 to-orange-400',
+    icon: (
+      <svg viewBox='0 0 32 32' class='h-6 w-6 text-slate-900'>
+        <path d='M9 22V12a1 1 0 0 1 2 0v10H9Z' fill='currentColor' />
+        <path d='M15 22V9a1 1 0 0 1 2 0v13h-2Z' fill='currentColor' />
+        <path d='M21 22v-6a1 1 0 0 1 2 0v6h-2Z' fill='currentColor' />
+      </svg>
+    ),
+    actions: [
+      {
+        label: 'Deploy',
+        intent: IntentTypes.Primary,
+        href: 'mailto:support@fathym.com?subject=Deploy%20Power%20BI%20on%20my%20metal',
+      },
+      {
+        label: 'Connect',
+        intent: IntentTypes.Info,
+        href: 'mailto:support@fathym.com?subject=Connect%20Power%20BI%20to%20Open%20Industrial',
+        outline: true,
+      },
+    ],
+  },
+  {
+    name: 'Grafana',
+    tagline: 'Unified dashboards for OT and IT telemetry',
+    description:
+      'Grafana visualizes time-series and event data from every corner of the plant. Run it on-prem today, integrate your historians and MQTT brokers, and snap it into Open Industrial routing when the cloud connection is ready.',
+    topAccent: 'from-neon-violet-500/80 via-sky-500/70 to-cyan-400/80',
+    iconAccent: 'from-orange-500 via-amber-400 to-rose-400',
+    icon: (
+      <svg viewBox='0 0 32 32' class='h-6 w-6 text-white'>
+        <path
+          d='M16 22a6 6 0 1 1 4.24-10.24 5 5 0 1 0 1.65 3.76A5 5 0 0 0 21 10.33 8 8 0 1 0 16 22Z'
+          fill='currentColor'
+        />
+      </svg>
+    ),
+    actions: [
+      {
+        label: 'Deploy',
+        intent: IntentTypes.Primary,
+        href: 'mailto:support@fathym.com?subject=Deploy%20Grafana%20on%20my%20metal',
+      },
+      {
+        label: 'Connect',
+        intent: IntentTypes.Info,
+        href: 'mailto:support@fathym.com?subject=Connect%20Grafana%20to%20Open%20Industrial',
+        outline: true,
+      },
+    ],
+  },
+];
+
+function CapabilityCard({
+  capability,
+  showActions,
+}: {
+  capability: CapabilityPromo;
+  showActions: boolean;
+}): JSX.Element {
+  return (
+    <div class='relative overflow-hidden rounded-3xl border border-slate-700/50 bg-slate-900/70 p-6 shadow-xl transition-transform duration-300 hover:-translate-y-1 hover:border-slate-500/60'>
+      <div class={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${capability.topAccent} opacity-80`}>
+      </div>
+      <div class='flex flex-col gap-4'>
+        <div class='flex items-start gap-3'>
+          <div class={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${capability.iconAccent} text-slate-900 shadow-lg`}>
+            {capability.icon}
+          </div>
+          <div>
+            <h5 class='text-lg font-semibold text-white'>{capability.name}</h5>
+            <p class='text-xs font-semibold uppercase tracking-[0.2em] text-slate-400'>
+              {capability.tagline}
+            </p>
+          </div>
+        </div>
+        <p class='text-sm leading-relaxed text-slate-300'>
+          {capability.description}
+        </p>
+        {showActions
+          ? (
+            <div class='flex flex-wrap gap-2'>
+              {capability.actions.map((action) => (
+                <Action
+                  key={action.label}
+                  href={action.href}
+                  intentType={action.intent}
+                  styleType={
+                    (action.outline
+                      ? ActionStyleTypes.Outline
+                      : ActionStyleTypes.Solid) | ActionStyleTypes.Rounded
+                  }
+                >
+                  {action.label}
+                </Action>
+              ))}
+            </div>
+          )
+          : (
+            <p class='text-xs text-slate-400'>
+              Connect your workspace cloud to unlock Deploy and Connect actions.
+            </p>
+          )}
+      </div>
+    </div>
+  );
+}
 
 const stepLabels: Array<{ index: 0 | 1 | 2; label: string }> = [
   { index: 0, label: 'Prereqs' },
@@ -279,169 +462,195 @@ export function PrivateCALZModal({
         </section>
 
         {!hasWorkspaceCloud && (
-          <div class='relative overflow-hidden rounded-3xl border border-amber-400/60 bg-amber-500/10 p-6 text-amber-100 shadow-xl'>
-            <div class='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-amber-400/60 via-orange-400/50 to-pink-400/60 opacity-70'>
+          <section class='space-y-6'>
+            <div class='relative overflow-hidden rounded-3xl border border-amber-400/60 bg-amber-500/10 p-6 text-amber-100 shadow-xl'>
+              <div class='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-amber-400/60 via-orange-400/50 to-pink-400/60 opacity-70'>
+              </div>
+              <h4 class='text-base font-semibold text-amber-100'>Workspace cloud required</h4>
+              <p class='mt-2 text-sm text-amber-100/80'>
+                No workspace cloud is configured yet. Connect Azure under Environment -{'>'} Cloud Connections to unlock private CALZ automation.
+              </p>
+              <p class='mt-3 text-sm text-amber-100/90'>
+                While that&apos;s provisioning, you can still light up these edge-ready experiences on your own metal. We&apos;ll snap them into your flow the moment the workspace cloud joins.
+              </p>
             </div>
-            <h4 class='text-base font-semibold text-amber-100'>Workspace cloud required</h4>
-            <p class='mt-2 text-sm text-amber-100/80'>
-              No workspace cloud is configured yet. Visit Environment -&gt; Cloud Connections to
-              link Azure, then return here to light up private CALZ.
-            </p>
-          </div>
+
+            <div class='grid gap-5 lg:grid-cols-2'>
+              {capabilityPromos.map((capability) => (
+                <CapabilityCard key={capability.name} capability={capability} showActions={false} />
+              ))}
+            </div>
+          </section>
         )}
 
         {hasWorkspaceCloud && (
-          <section class='relative overflow-hidden rounded-3xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-xl space-y-6'>
-            <div class='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-emerald-400/50 via-sky-400/40 to-cyan-400/50 opacity-80'>
-            </div>
-
-            <div class='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-              <div class='space-y-2'>
-                <h4 class='text-xl font-semibold text-white'>Workspace Cloud</h4>
-                <p class='text-sm text-slate-300'>
-                  {workspaceCloud?.Details?.Name || 'Workspace Cloud'} -{' '}
-                  {workspaceCloud?.Details?.Type || 'Azure'}
-                </p>
+          <>
+            <section class='relative overflow-hidden rounded-3xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-xl space-y-6'>
+              <div class='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-emerald-400/50 via-sky-400/40 to-cyan-400/50 opacity-80'>
               </div>
-              <div class='rounded-2xl border border-slate-700/60 bg-slate-900/60 px-4 py-3 text-xs text-slate-300'>
-                <div>Regions loaded: {locations.length || 0}</div>
-                <div class='mt-1'>
-                  Providers ready: {providersBusy ? 'Working...' : 'Ensure before provisioning'}
+
+              <div class='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+                <div class='space-y-2'>
+                  <h4 class='text-xl font-semibold text-white'>Workspace Cloud</h4>
+                  <p class='text-sm text-slate-300'>
+                    {workspaceCloud?.Details?.Name || 'Workspace Cloud'} -{' '}
+                    {workspaceCloud?.Details?.Type || 'Azure'}
+                  </p>
+                </div>
+                <div class='rounded-2xl border border-slate-700/60 bg-slate-900/60 px-4 py-3 text-xs text-slate-300'>
+                  <div>Regions loaded: {locations.length || 0}</div>
+                  <div class='mt-1'>
+                    Providers ready: {providersBusy ? 'Working...' : 'Ensure before provisioning'}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div class='flex flex-wrap items-center gap-3 text-xs font-semibold'>
-              {stepLabels.map((item, idx) => (
-                <span class='flex items-center gap-2' key={item.index}>
-                  <span class={item.index === step ? 'text-sky-300' : 'text-slate-500'}>
-                    {item.index}. {item.label}
+              <div class='flex flex-wrap items-center gap-3 text-xs font-semibold'>
+                {stepLabels.map((item, idx) => (
+                  <span class='flex items-center gap-2' key={item.index}>
+                    <span class={item.index === step ? 'text-sky-300' : 'text-slate-500'}>
+                      {item.index}. {item.label}
+                    </span>
+                    {idx < stepLabels.length - 1 && <span class='text-slate-600'>{'>'}</span>}
                   </span>
-                  {idx < stepLabels.length - 1 && <span class='text-slate-600'>{'>'}</span>}
-                </span>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            {step === 0 && (
-              <div class='space-y-4 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5'>
+              {step === 0 && (
+                <div class='space-y-4 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5'>
+                  <p class='text-sm text-slate-300'>
+                    Run these quick prep tasks so Azure is ready for the landing zone deployment.
+                  </p>
+                  <div class='flex flex-wrap gap-2'>
+                    <Action
+                      styleType={ActionStyleTypes.Outline}
+                      onClick={ensureProviders}
+                      disabled={providersBusy}
+                    >
+                      {providersBusy ? 'Registering providers...' : 'Ensure Providers'}
+                    </Action>
+                    <Action
+                      styleType={ActionStyleTypes.Outline}
+                      onClick={loadLocations}
+                      disabled={loadingLocs}
+                    >
+                      {loadingLocs ? 'Loading regions...' : 'Load Regions'}
+                    </Action>
+                  </div>
+                  <div class='text-sm text-slate-300'>
+                    {loadingLocs
+                      ? (
+                        <span class='inline-flex items-center gap-2'>
+                          <LoadingIcon class='h-4 w-4 animate-spin text-sky-300' /> Getting regions...
+                        </span>
+                      )
+                      : locations.length > 0
+                      ? <span>Regions ready: {locations.length}</span>
+                      : <span>No regions loaded yet.</span>}
+                  </div>
+                  <div class='pt-2'>
+                    <Action
+                      onClick={() => setStep(1)}
+                      disabled={loadingLocs || providersBusy}
+                    >
+                      Continue to Base
+                    </Action>
+                  </div>
+                </div>
+              )}
+
+              {step === 1 && (
+                <div class='space-y-4 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5'>
+                  <div>
+                    <label class='mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-400'>
+                      Resource Group Name
+                    </label>
+                    <input
+                      class='w-full rounded-lg border border-slate-700/60 bg-slate-900/60 px-3 py-2 text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-400/60'
+                      value={rgName}
+                      onInput={(e) => setRgName((e.target as HTMLInputElement).value)}
+                    />
+                  </div>
+                  <div>
+                    <label class='mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-400'>
+                      Region
+                    </label>
+                    <select
+                      class='w-full rounded-lg border border-slate-700/60 bg-slate-900/60 px-3 py-2 text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-400/60'
+                      value={region}
+                      onChange={(e) => setRegion((e.target as HTMLSelectElement).value)}
+                    >
+                      {locations.map((l) => (
+                        <option value={l.Name} key={l.Name}>
+                          {l.Name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {baseErr && <div class='text-xs text-rose-400'>{baseErr}</div>}
+                  <div class='flex flex-wrap items-center gap-2'>
+                    <Action
+                      styleType={ActionStyleTypes.Outline}
+                      onClick={() => setStep(0)}
+                    >
+                      Back
+                    </Action>
+                    <Action onClick={submitBase} disabled={baseBusy || !region || !rgName}>
+                      {baseBusy ? 'Provisioning...' : 'Provision Base'}
+                    </Action>
+                    {baseDone && <span class='text-xs text-emerald-300'>Base committed.</span>}
+                  </div>
+                </div>
+              )}
+
+              {step === 2 && (
+                <div class='space-y-4 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5'>
+                  <p class='text-sm text-slate-300'>
+                    Add the IoT layer so telemetry gateways and device onboarding are ready for your
+                    workloads.
+                  </p>
+                  {iotErr && <div class='text-xs text-rose-400'>{iotErr}</div>}
+                  <div class='flex flex-wrap items-center gap-2'>
+                    <Action
+                      styleType={ActionStyleTypes.Outline}
+                      onClick={() => setStep(1)}
+                    >
+                      Back
+                    </Action>
+                    <Action onClick={submitIoT} disabled={iotBusy || !rgName}>
+                      {iotBusy ? 'Applying...' : 'Provision IoT Layer'}
+                    </Action>
+                    {iotDone && <span class='text-xs text-emerald-300'>IoT layer initialized.</span>}
+                  </div>
+                </div>
+              )}
+
+              <div class='rounded-2xl border border-slate-700/60 bg-slate-900/60 p-4 text-slate-300'>
+                Want it faster? Email{' '}
+                <a
+                  href='mailto:support@fathym.com?subject=Private%20CALZ%20Setup'
+                  class='font-semibold text-sky-300 hover:text-sky-200'
+                >
+                  support@fathym.com
+                </a>{' '}
+                and the team will help provision it today.
+              </div>
+            </section>
+
+            <section class='space-y-5 rounded-3xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-xl'>
+              <div class='space-y-2'>
+                <h4 class='text-xl font-semibold text-white'>Deploy edge capabilities</h4>
                 <p class='text-sm text-slate-300'>
-                  Run these quick prep tasks so Azure is ready for the landing zone deployment.
+                  With your workspace cloud online, spin up these platforms and wire their data into Open Industrial workflows.
                 </p>
-                <div class='flex flex-wrap gap-2'>
-                  <Action
-                    styleType={ActionStyleTypes.Outline}
-                    onClick={ensureProviders}
-                    disabled={providersBusy}
-                  >
-                    {providersBusy ? 'Registering providers...' : 'Ensure Providers'}
-                  </Action>
-                  <Action
-                    styleType={ActionStyleTypes.Outline}
-                    onClick={loadLocations}
-                    disabled={loadingLocs}
-                  >
-                    {loadingLocs ? 'Loading regions...' : 'Load Regions'}
-                  </Action>
-                </div>
-                <div class='text-sm text-slate-300'>
-                  {loadingLocs
-                    ? (
-                      <span class='inline-flex items-center gap-2'>
-                        <LoadingIcon class='h-4 w-4 animate-spin text-sky-300' /> Getting regions...
-                      </span>
-                    )
-                    : locations.length > 0
-                    ? <span>Regions ready: {locations.length}</span>
-                    : <span>No regions loaded yet.</span>}
-                </div>
-                <div class='pt-2'>
-                  <Action
-                    onClick={() => setStep(1)}
-                    disabled={loadingLocs || providersBusy}
-                  >
-                    Continue to Base
-                  </Action>
-                </div>
               </div>
-            )}
-
-            {step === 1 && (
-              <div class='space-y-4 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5'>
-                <div>
-                  <label class='mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-400'>
-                    Resource Group Name
-                  </label>
-                  <input
-                    class='w-full rounded-lg border border-slate-700/60 bg-slate-900/60 px-3 py-2 text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-400/60'
-                    value={rgName}
-                    onInput={(e) => setRgName((e.target as HTMLInputElement).value)}
-                  />
-                </div>
-                <div>
-                  <label class='mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-400'>
-                    Region
-                  </label>
-                  <select
-                    class='w-full rounded-lg border border-slate-700/60 bg-slate-900/60 px-3 py-2 text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-400/60'
-                    value={region}
-                    onChange={(e) => setRegion((e.target as HTMLSelectElement).value)}
-                  >
-                    {locations.map((l) => (
-                      <option value={l.Name} key={l.Name}>
-                        {l.Name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {baseErr && <div class='text-xs text-rose-400'>{baseErr}</div>}
-                <div class='flex flex-wrap items-center gap-2'>
-                  <Action
-                    styleType={ActionStyleTypes.Outline}
-                    onClick={() => setStep(0)}
-                  >
-                    Back
-                  </Action>
-                  <Action onClick={submitBase} disabled={baseBusy || !region || !rgName}>
-                    {baseBusy ? 'Provisioning...' : 'Provision Base'}
-                  </Action>
-                  {baseDone && <span class='text-xs text-emerald-300'>Base committed.</span>}
-                </div>
+              <div class='grid gap-5 lg:grid-cols-2'>
+                {capabilityPromos.map((capability) => (
+                  <CapabilityCard key={capability.name} capability={capability} showActions />
+                ))}
               </div>
-            )}
-
-            {step === 2 && (
-              <div class='space-y-4 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5'>
-                <p class='text-sm text-slate-300'>
-                  Add the IoT layer so telemetry gateways and device onboarding are ready for your
-                  workloads.
-                </p>
-                {iotErr && <div class='text-xs text-rose-400'>{iotErr}</div>}
-                <div class='flex flex-wrap items-center gap-2'>
-                  <Action
-                    styleType={ActionStyleTypes.Outline}
-                    onClick={() => setStep(1)}
-                  >
-                    Back
-                  </Action>
-                  <Action onClick={submitIoT} disabled={iotBusy || !rgName}>
-                    {iotBusy ? 'Applying...' : 'Provision IoT Layer'}
-                  </Action>
-                  {iotDone && <span class='text-xs text-emerald-300'>IoT layer initialized.</span>}
-                </div>
-              </div>
-            )}
-
-            <div class='rounded-2xl border border-slate-700/60 bg-slate-900/60 p-4 text-slate-300'>
-              Want it faster? Email{' '}
-              <a
-                href='mailto:support@fathym.com?subject=Private%20CALZ%20Setup'
-                class='font-semibold text-sky-300 hover:text-sky-200'
-              >
-                support@fathym.com
-              </a>{' '}
-              and the team will help provision it today.
-            </div>
-          </section>
+            </section>
+          </>
         )}
       </div>
     </Modal>
