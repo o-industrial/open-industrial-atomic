@@ -1,4 +1,4 @@
-import { IntentTypes, JSX, useEffect, useState, WorkspaceManager } from '../../.deps.ts';
+import { JSX, useEffect, useState, WorkspaceManager } from '../../.deps.ts';
 import { Action, LoadingIcon, Modal } from '../../.exports.ts';
 import { ActionStyleTypes } from '../../atoms/Action.tsx';
 
@@ -13,7 +13,7 @@ const calzHighlights: CalzHighlight[] = [
   {
     title: '0. Prereqs',
     description:
-      'Register Azure resource providers, pull the latest regions, and get the workspace cloud ready for provisioning.',
+      'Register Azure resource providers, sync available regions, and validate Azure access so the workspace cloud can be provisioned safely.',
     accent: 'from-sky-500/70 via-cyan-400/70 to-emerald-400/70',
     icon: (
       <svg viewBox='0 0 24 24' fill='none' class='h-6 w-6'>
@@ -37,7 +37,7 @@ const calzHighlights: CalzHighlight[] = [
   {
     title: '1. Base Landing Zone',
     description:
-      'Name the resource group, pick a region, and let the base template deliver networking, vaults, and observability hooks.',
+      'Shape the landing zone resource group and lay down networking, Key Vault, and policy scaffolding tuned for private operations.',
     accent: 'from-indigo-500/70 via-sky-500/70 to-cyan-400/70',
     icon: (
       <svg viewBox='0 0 24 24' fill='none' class='h-6 w-6'>
@@ -52,212 +52,104 @@ const calzHighlights: CalzHighlight[] = [
     ),
   },
   {
-    title: '2. IoT Layer',
+    title: '2. Secure Operations',
     description:
-      'Layer in IoT Hub, DPS, and streaming services so telemetry can flow into CALZ experiences from day one.',
-    accent: 'from-fuchsia-500/70 via-violet-500/70 to-sky-400/70',
+      'Wire diagnostics, Log Analytics, and secret management so engineering teams inherit a healthy runway from day zero.',
+    accent: 'from-fuchsia-500/70 via-violet-500/70 to-indigo-400/70',
     icon: (
       <svg viewBox='0 0 24 24' fill='none' class='h-6 w-6'>
         <path
-          d='M12 4v4M12 16v4M4 12h4m8 0h4'
+          d='M12 5v14m7-8H5'
           stroke='currentColor'
           stroke-width='1.6'
           stroke-linecap='round'
           stroke-linejoin='round'
         />
-        <circle cx='12' cy='12' r='3' stroke='currentColor' stroke-width='1.6' />
+        <path
+          d='M7 9h2v2H7zm0 4h2v2H7zm8-4h2v2h-2zm0 4h2v2h-2z'
+          fill='currentColor'
+        />
       </svg>
     ),
   },
 ];
 
-type CapabilityPromo = {
-  name: string;
-  tagline: string;
+type PreconnectHighlight = {
+  title: string;
   description: string;
-  topAccent: string;
-  iconAccent: string;
+  accent: string;
   icon: JSX.Element;
-  actions: Array<{
-    label: string;
-    intent: IntentTypes;
-    href: string;
-    outline?: boolean;
-  }>;
 };
 
-const capabilityPromos: CapabilityPromo[] = [
+const preconnectHighlights: PreconnectHighlight[] = [
   {
-    name: 'HighByte',
-    tagline: 'Industrial DataOps, ready for your floor',
+    title: 'Key Vault readiness',
     description:
-      'HighByte brings contextualized DataOps to the edge. Deploy it on your infrastructure to model operations data now and stream enriched context into Open Industrial once your workspace cloud is linked.',
-    topAccent: 'from-emerald-500/70 via-sky-500/70 to-cyan-400/70',
-    iconAccent: 'from-emerald-500 via-sky-500 to-emerald-400',
-    icon: <span class='text-sm font-semibold tracking-wide text-white'>HB</span>,
-    actions: [
-      {
-        label: 'Deploy',
-        intent: IntentTypes.Primary,
-        href: 'mailto:support@fathym.com?subject=Deploy%20HighByte%20on%20my%20metal',
-      },
-      {
-        label: 'Connect',
-        intent: IntentTypes.Info,
-        href: 'mailto:support@fathym.com?subject=Connect%20HighByte%20to%20Open%20Industrial',
-        outline: true,
-      },
-    ],
-  },
-  {
-    name: 'NodeRed',
-    tagline: 'Flow-based orchestration at the edge',
-    description:
-      'Node-RED lets you wire devices, services, and APIs with drag-and-drop flows. Stand it up on your metal, automate processes locally, and be ready to register those flows with CALZ once the workspace cloud comes online.',
-    topAccent: 'from-fuchsia-500/70 via-violet-500/70 to-sky-500/70',
-    iconAccent: 'from-rose-500 via-red-500 to-orange-500',
+      'Document your secret rotation policy, identify certificates to import, and note which services will need managed identities once the vault is online.',
+    accent: 'from-amber-500/70 via-orange-400/60 to-pink-400/60',
     icon: (
-      <svg viewBox='0 0 32 32' class='h-6 w-6 text-white'>
+      <svg viewBox='0 0 24 24' fill='none' class='h-6 w-6'>
         <path
-          d='M10 10a2 2 0 0 1 4 0v2h4a2 2 0 1 1 0 4h-1.5a2.5 2.5 0 1 1-5 0H10a2 2 0 1 1 0-4h1.5V10Z'
-          fill='currentColor'
+          d='M12 3a4 4 0 0 0-4 4v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a4 4 0 0 0-4-4Z'
+          stroke='currentColor'
+          stroke-width='1.6'
+          stroke-linecap='round'
+          stroke-linejoin='round'
         />
-        <circle cx='21.5' cy='16' r='1.5' fill='currentColor' />
-        <circle cx='10' cy='14' r='1.5' fill='currentColor' />
-      </svg>
-    ),
-    actions: [
-      {
-        label: 'Deploy',
-        intent: IntentTypes.Primary,
-        href: 'mailto:support@fathym.com?subject=Deploy%20Node-RED%20on%20my%20metal',
-      },
-      {
-        label: 'Connect',
-        intent: IntentTypes.Info,
-        href: 'mailto:support@fathym.com?subject=Connect%20Node-RED%20to%20Open%20Industrial',
-        outline: true,
-      },
-    ],
-  },
-  {
-    name: 'PowerBI',
-    tagline: 'Analytics that meet your operators where they work',
-    description:
-      'Power BI dashboards turn edge data into business intelligence. Spin up local gateways, craft reports, and when the workspace cloud is ready, plug them into Open Industrial for governed sharing.',
-    topAccent: 'from-amber-400/70 via-orange-400/70 to-pink-400/70',
-    iconAccent: 'from-amber-400 via-yellow-400 to-orange-400',
-    icon: (
-      <svg viewBox='0 0 32 32' class='h-6 w-6 text-slate-900'>
-        <path d='M9 22V12a1 1 0 0 1 2 0v10H9Z' fill='currentColor' />
-        <path d='M15 22V9a1 1 0 0 1 2 0v13h-2Z' fill='currentColor' />
-        <path d='M21 22v-6a1 1 0 0 1 2 0v6h-2Z' fill='currentColor' />
-      </svg>
-    ),
-    actions: [
-      {
-        label: 'Deploy',
-        intent: IntentTypes.Primary,
-        href: 'mailto:support@fathym.com?subject=Deploy%20Power%20BI%20on%20my%20metal',
-      },
-      {
-        label: 'Connect',
-        intent: IntentTypes.Info,
-        href: 'mailto:support@fathym.com?subject=Connect%20Power%20BI%20to%20Open%20Industrial',
-        outline: true,
-      },
-    ],
-  },
-  {
-    name: 'Grafana',
-    tagline: 'Unified dashboards for OT and IT telemetry',
-    description:
-      'Grafana visualizes time-series and event data from every corner of the plant. Run it on-prem today, integrate your historians and MQTT brokers, and snap it into Open Industrial routing when the cloud connection is ready.',
-    topAccent: 'from-neon-violet-500/80 via-sky-500/70 to-cyan-400/80',
-    iconAccent: 'from-orange-500 via-amber-400 to-rose-400',
-    icon: (
-      <svg viewBox='0 0 32 32' class='h-6 w-6 text-white'>
         <path
-          d='M16 22a6 6 0 1 1 4.24-10.24 5 5 0 1 0 1.65 3.76A5 5 0 0 0 21 10.33 8 8 0 1 0 16 22Z'
-          fill='currentColor'
+          d='M12 14v2'
+          stroke='currentColor'
+          stroke-width='1.6'
+          stroke-linecap='round'
         />
       </svg>
     ),
-    actions: [
-      {
-        label: 'Deploy',
-        intent: IntentTypes.Primary,
-        href: 'mailto:support@fathym.com?subject=Deploy%20Grafana%20on%20my%20metal',
-      },
-      {
-        label: 'Connect',
-        intent: IntentTypes.Info,
-        href: 'mailto:support@fathym.com?subject=Connect%20Grafana%20to%20Open%20Industrial',
-        outline: true,
-      },
-    ],
+  },
+  {
+    title: 'Logging & analytics plan',
+    description:
+      'Decide which resource diagnostics need to land in Log Analytics, set retention goals, and capture any existing SIEM forwarding requirements.',
+    accent: 'from-sky-500/70 via-indigo-500/70 to-violet-500/70',
+    icon: (
+      <svg viewBox='0 0 24 24' fill='none' class='h-6 w-6'>
+        <path
+          d='M5 19h14M7 16V8m5 8V5m5 11V10'
+          stroke='currentColor'
+          stroke-width='1.6'
+          stroke-linecap='round'
+          stroke-linejoin='round'
+        />
+      </svg>
+    ),
+  },
+  {
+    title: 'Policy baseline review',
+    description:
+      'List the required Azure Policy assignments, RBAC roles, and resource tags so they can be baked into the landing zone templates.',
+    accent: 'from-emerald-500/70 via-teal-400/70 to-sky-500/70',
+    icon: (
+      <svg viewBox='0 0 24 24' fill='none' class='h-6 w-6'>
+        <path
+          d='M12 4 4 8v8l8 4 8-4V8l-8-4Z'
+          stroke='currentColor'
+          stroke-width='1.6'
+          stroke-linejoin='round'
+        />
+        <path
+          d='m9 12 2 2 4-4'
+          stroke='currentColor'
+          stroke-width='1.6'
+          stroke-linecap='round'
+          stroke-linejoin='round'
+        />
+      </svg>
+    ),
   },
 ];
 
-function CapabilityCard({
-  capability,
-  showActions,
-}: {
-  capability: CapabilityPromo;
-  showActions: boolean;
-}): JSX.Element {
-  return (
-    <div class='relative overflow-hidden rounded-3xl border border-slate-700/50 bg-slate-900/70 p-6 shadow-xl transition-transform duration-300 hover:-translate-y-1 hover:border-slate-500/60'>
-      <div class={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${capability.topAccent} opacity-80`}>
-      </div>
-      <div class='flex flex-col gap-4'>
-        <div class='flex items-start gap-3'>
-          <div class={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${capability.iconAccent} text-slate-900 shadow-lg`}>
-            {capability.icon}
-          </div>
-          <div>
-            <h5 class='text-lg font-semibold text-white'>{capability.name}</h5>
-            <p class='text-xs font-semibold uppercase tracking-[0.2em] text-slate-400'>
-              {capability.tagline}
-            </p>
-          </div>
-        </div>
-        <p class='text-sm leading-relaxed text-slate-300'>
-          {capability.description}
-        </p>
-        {showActions
-          ? (
-            <div class='flex flex-wrap gap-2'>
-              {capability.actions.map((action) => (
-                <Action
-                  key={action.label}
-                  href={action.href}
-                  intentType={action.intent}
-                  styleType={
-                    (action.outline
-                      ? ActionStyleTypes.Outline
-                      : ActionStyleTypes.Solid) | ActionStyleTypes.Rounded
-                  }
-                >
-                  {action.label}
-                </Action>
-              ))}
-            </div>
-          )
-          : (
-            <p class='text-xs text-slate-400'>
-              Connect your workspace cloud to unlock Deploy and Connect actions.
-            </p>
-          )}
-      </div>
-    </div>
-  );
-}
-
-const stepLabels: Array<{ index: 0 | 1 | 2; label: string }> = [
+const stepLabels: Array<{ index: 0 | 1; label: string }> = [
   { index: 0, label: 'Prereqs' },
-  { index: 1, label: 'Base' },
-  { index: 2, label: 'IoT' },
+  { index: 1, label: 'Base Foundation' },
 ];
 
 export type PrivateCALZModalProps = {
@@ -271,7 +163,7 @@ export function PrivateCALZModal({
 }: PrivateCALZModalProps): JSX.Element {
   const eac = workspaceMgr.UseEaC();
   const workspaceCloud = (eac?.Clouds || {})['Workspace'];
-  const [step, setStep] = useState<0 | 1 | 2>(0);
+  const [step, setStep] = useState<0 | 1>(0);
   const [locations, setLocations] = useState<{ Name: string }[]>([]);
   const [loadingLocs, setLoadingLocs] = useState(false);
   const [providersBusy, setProvidersBusy] = useState(false);
@@ -282,11 +174,6 @@ export function PrivateCALZModal({
   const [baseBusy, setBaseBusy] = useState(false);
   const [baseDone, setBaseDone] = useState(false);
   const [baseErr, setBaseErr] = useState<string | undefined>(undefined);
-
-  // Step 2: IoT inputs
-  const [iotBusy, setIotBusy] = useState(false);
-  const [iotDone, setIotDone] = useState(false);
-  const [iotErr, setIotErr] = useState<string | undefined>(undefined);
 
   const loadLocations = async () => {
     try {
@@ -348,30 +235,11 @@ export function PrivateCALZModal({
       const data = await res.json();
       if (!data?.status) throw new Error('No status returned');
       setBaseDone(true);
-      setStep(2);
+      setStep(1);
     } catch (err) {
       setBaseErr((err as Error).message);
     } finally {
       setBaseBusy(false);
-    }
-  };
-
-  const submitIoT = async () => {
-    try {
-      setIotBusy(true);
-      setIotErr(undefined);
-      const res = await fetch('/workspace/api/o-industrial/calz/iot', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ rgName }),
-      });
-      const data = await res.json();
-      if (!data?.status) throw new Error('No status returned');
-      setIotDone(true);
-    } catch (err) {
-      setIotErr((err as Error).message);
-    } finally {
-      setIotBusy(false);
     }
   };
 
@@ -383,13 +251,13 @@ export function PrivateCALZModal({
     ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200'
     : 'border-amber-400/40 bg-amber-500/10 text-amber-200';
   const heroTitle = hasWorkspaceCloud
-    ? 'Shape your private CALZ runway'
+    ? 'Manage your private CALZ foundation'
     : 'Connect a workspace cloud to begin';
   const heroDescription = hasWorkspaceCloud
-    ? 'Provision landing zones, register providers, and stage IoT services in a guided sequence tuned for private deployments.'
+    ? 'Provision the landing zone, reinforce governance, and validate secrets and observability so every workload inherits a compliant baseline.'
     : 'Link a workspace cloud first. Once connected, this guide unlocks private CALZ automation tailored to your environment.';
   const heroPillText = hasWorkspaceCloud
-    ? step === 2 ? 'IoT Layer' : step === 1 ? 'Base Layer' : 'Prereqs'
+    ? step === 1 ? 'Base Foundation' : 'Prereqs'
     : 'First Step';
 
   return (
@@ -471,96 +339,111 @@ export function PrivateCALZModal({
                 No workspace cloud is configured yet. Connect Azure under Environment -{'>'} Cloud Connections to unlock private CALZ automation.
               </p>
               <p class='mt-3 text-sm text-amber-100/90'>
-                While that&apos;s provisioning, you can still light up these edge-ready experiences on your own metal. We&apos;ll snap them into your flow the moment the workspace cloud joins.
+                While that&apos;s provisioning, capture the readiness details below so Key Vault, logging, and governance can land smoothly once connected.
               </p>
             </div>
 
             <div class='grid gap-5 lg:grid-cols-2'>
-              {capabilityPromos.map((capability) => (
-                <CapabilityCard key={capability.name} capability={capability} showActions={false} />
+              {preconnectHighlights.map((item) => (
+                <div
+                  key={item.title}
+                  class='relative overflow-hidden rounded-3xl border border-slate-700/50 bg-slate-900/70 p-5 shadow-lg'
+                >
+                  <div class={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${item.accent} opacity-80`}>
+                  </div>
+                  <div class='flex items-start gap-3'>
+                    <div class={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${item.accent} text-slate-900 shadow-md`}>
+                      {item.icon}
+                    </div>
+                    <div class='space-y-1'>
+                      <h5 class='text-base font-semibold text-white'>{item.title}</h5>
+                      <p class='text-sm text-slate-300 leading-relaxed'>{item.description}</p>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           </section>
         )}
 
         {hasWorkspaceCloud && (
-          <>
-            <section class='relative overflow-hidden rounded-3xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-xl space-y-6'>
-              <div class='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-emerald-400/50 via-sky-400/40 to-cyan-400/50 opacity-80'>
-              </div>
+          <section class='relative overflow-hidden rounded-3xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-xl space-y-6'>
+            <div class='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-emerald-400/50 via-sky-400/40 to-cyan-400/50 opacity-80'>
+            </div>
 
-              <div class='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-                <div class='space-y-2'>
-                  <h4 class='text-xl font-semibold text-white'>Workspace Cloud</h4>
-                  <p class='text-sm text-slate-300'>
-                    {workspaceCloud?.Details?.Name || 'Workspace Cloud'} -{' '}
-                    {workspaceCloud?.Details?.Type || 'Azure'}
-                  </p>
-                </div>
-                <div class='rounded-2xl border border-slate-700/60 bg-slate-900/60 px-4 py-3 text-xs text-slate-300'>
-                  <div>Regions loaded: {locations.length || 0}</div>
-                  <div class='mt-1'>
-                    Providers ready: {providersBusy ? 'Working...' : 'Ensure before provisioning'}
-                  </div>
+            <div class='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+              <div class='space-y-2'>
+                <h4 class='text-xl font-semibold text-white'>Workspace Cloud</h4>
+                <p class='text-sm text-slate-300'>
+                  {workspaceCloud?.Details?.Name || 'Workspace Cloud'} -{' '}
+                  {workspaceCloud?.Details?.Type || 'Azure'}
+                </p>
+              </div>
+              <div class='rounded-2xl border border-slate-700/60 bg-slate-900/60 px-4 py-3 text-xs text-slate-300'>
+                <div>Regions loaded: {locations.length || 0}</div>
+                <div class='mt-1'>
+                  Providers ready: {providersBusy ? 'Working...' : 'Ensure before provisioning'}
                 </div>
               </div>
+            </div>
 
-              <div class='flex flex-wrap items-center gap-3 text-xs font-semibold'>
-                {stepLabels.map((item, idx) => (
-                  <span class='flex items-center gap-2' key={item.index}>
-                    <span class={item.index === step ? 'text-sky-300' : 'text-slate-500'}>
-                      {item.index}. {item.label}
-                    </span>
-                    {idx < stepLabels.length - 1 && <span class='text-slate-600'>{'>'}</span>}
+            <div class='flex flex-wrap items-center gap-3 text-xs font-semibold'>
+              {stepLabels.map((item, idx) => (
+                <span class='flex items-center gap-2' key={item.index}>
+                  <span class={item.index === step ? 'text-sky-300' : 'text-slate-500'}>
+                    {item.index}. {item.label}
                   </span>
-                ))}
-              </div>
+                  {idx < stepLabels.length - 1 && <span class='text-slate-600'>{'>'}</span>}
+                </span>
+              ))}
+            </div>
 
-              {step === 0 && (
-                <div class='space-y-4 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5'>
-                  <p class='text-sm text-slate-300'>
-                    Run these quick prep tasks so Azure is ready for the landing zone deployment.
-                  </p>
-                  <div class='flex flex-wrap gap-2'>
-                    <Action
-                      styleType={ActionStyleTypes.Outline}
-                      onClick={ensureProviders}
-                      disabled={providersBusy}
-                    >
-                      {providersBusy ? 'Registering providers...' : 'Ensure Providers'}
-                    </Action>
-                    <Action
-                      styleType={ActionStyleTypes.Outline}
-                      onClick={loadLocations}
-                      disabled={loadingLocs}
-                    >
-                      {loadingLocs ? 'Loading regions...' : 'Load Regions'}
-                    </Action>
-                  </div>
-                  <div class='text-sm text-slate-300'>
-                    {loadingLocs
-                      ? (
-                        <span class='inline-flex items-center gap-2'>
-                          <LoadingIcon class='h-4 w-4 animate-spin text-sky-300' /> Getting regions...
-                        </span>
-                      )
-                      : locations.length > 0
-                      ? <span>Regions ready: {locations.length}</span>
-                      : <span>No regions loaded yet.</span>}
-                  </div>
-                  <div class='pt-2'>
-                    <Action
-                      onClick={() => setStep(1)}
-                      disabled={loadingLocs || providersBusy}
-                    >
-                      Continue to Base
-                    </Action>
-                  </div>
+            {step === 0 && (
+              <div class='space-y-4 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5'>
+                <p class='text-sm text-slate-300'>
+                  Run these readiness checks so Azure is primed for the landing zone rollout.
+                </p>
+                <div class='flex flex-wrap gap-2'>
+                  <Action
+                    styleType={ActionStyleTypes.Outline}
+                    onClick={ensureProviders}
+                    disabled={providersBusy}
+                  >
+                    {providersBusy ? 'Registering providers...' : 'Ensure Providers'}
+                  </Action>
+                  <Action
+                    styleType={ActionStyleTypes.Outline}
+                    onClick={loadLocations}
+                    disabled={loadingLocs}
+                  >
+                    {loadingLocs ? 'Loading regions...' : 'Load Regions'}
+                  </Action>
                 </div>
-              )}
+                <div class='text-sm text-slate-300'>
+                  {loadingLocs
+                    ? (
+                      <span class='inline-flex items-center gap-2'>
+                        <LoadingIcon class='h-4 w-4 animate-spin text-sky-300' /> Getting regions...
+                      </span>
+                    )
+                    : locations.length > 0
+                    ? <span>Regions ready: {locations.length}</span>
+                    : <span>No regions loaded yet.</span>}
+                </div>
+                <div class='pt-2'>
+                  <Action
+                    onClick={() => setStep(1)}
+                    disabled={loadingLocs || providersBusy}
+                  >
+                    Continue to Base
+                  </Action>
+                </div>
+              </div>
+            )}
 
-              {step === 1 && (
-                <div class='space-y-4 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5'>
+            {step === 1 && (
+              <div class='space-y-6 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5'>
+                <div class='space-y-4'>
                   <div>
                     <label class='mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-400'>
                       Resource Group Name
@@ -598,59 +481,69 @@ export function PrivateCALZModal({
                     <Action onClick={submitBase} disabled={baseBusy || !region || !rgName}>
                       {baseBusy ? 'Provisioning...' : 'Provision Base'}
                     </Action>
-                    {baseDone && <span class='text-xs text-emerald-300'>Base committed.</span>}
+                    {baseDone && (
+                      <span class='text-xs text-emerald-300'>
+                        Landing zone applied. Review the services below to finish hardening.
+                      </span>
+                    )}
                   </div>
                 </div>
-              )}
 
-              {step === 2 && (
-                <div class='space-y-4 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5'>
-                  <p class='text-sm text-slate-300'>
-                    Add the IoT layer so telemetry gateways and device onboarding are ready for your
-                    workloads.
-                  </p>
-                  {iotErr && <div class='text-xs text-rose-400'>{iotErr}</div>}
-                  <div class='flex flex-wrap items-center gap-2'>
-                    <Action
-                      styleType={ActionStyleTypes.Outline}
-                      onClick={() => setStep(1)}
+                <div class='grid gap-4 md:grid-cols-2'>
+                  {[
+                    {
+                      title: 'Azure Key Vault',
+                      status: baseDone ? 'Ready for secrets' : 'Pending provisioning',
+                      description:
+                        'Import certificates, set access policies, and confirm rotation cadence for shared secrets.',
+                    },
+                    {
+                      title: 'Log Analytics Workspace',
+                      status: baseDone ? 'Connected to RG' : 'Awaiting base resources',
+                      description:
+                        'Map resource diagnostic settings and define retention so operations insights stay actionable.',
+                    },
+                    {
+                      title: 'Monitor & Alerts',
+                      status: baseDone ? 'Baseline rules queued' : 'Activate after base deploy',
+                      description:
+                        'Review default metric alerts and wire them into your on-call tooling.',
+                    },
+                    {
+                      title: 'Policy & RBAC',
+                      status: baseDone ? 'Assignments staged' : 'Compile requirements',
+                      description:
+                        'Confirm role assignments and Azure Policy definitions align to your compliance baseline.',
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.title}
+                      class='rounded-2xl border border-slate-700/60 bg-slate-900/70 p-4'
                     >
-                      Back
-                    </Action>
-                    <Action onClick={submitIoT} disabled={iotBusy || !rgName}>
-                      {iotBusy ? 'Applying...' : 'Provision IoT Layer'}
-                    </Action>
-                    {iotDone && <span class='text-xs text-emerald-300'>IoT layer initialized.</span>}
-                  </div>
+                      <div class='flex items-center justify-between gap-3 text-sm'>
+                        <h5 class='font-semibold text-white'>{item.title}</h5>
+                        <span class={`text-xs ${baseDone ? 'text-emerald-300' : 'text-slate-400'}`}>
+                          {item.status}
+                        </span>
+                      </div>
+                      <p class='mt-2 text-xs text-slate-400 leading-relaxed'>{item.description}</p>
+                    </div>
+                  ))}
                 </div>
-              )}
+              </div>
+            )}
 
-              <div class='rounded-2xl border border-slate-700/60 bg-slate-900/60 p-4 text-slate-300'>
-                Want it faster? Email{' '}
-                <a
-                  href='mailto:support@fathym.com?subject=Private%20CALZ%20Setup'
-                  class='font-semibold text-sky-300 hover:text-sky-200'
-                >
-                  support@fathym.com
-                </a>{' '}
-                and the team will help provision it today.
-              </div>
-            </section>
-
-            <section class='space-y-5 rounded-3xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-xl'>
-              <div class='space-y-2'>
-                <h4 class='text-xl font-semibold text-white'>Deploy edge capabilities</h4>
-                <p class='text-sm text-slate-300'>
-                  With your workspace cloud online, spin up these platforms and wire their data into Open Industrial workflows.
-                </p>
-              </div>
-              <div class='grid gap-5 lg:grid-cols-2'>
-                {capabilityPromos.map((capability) => (
-                  <CapabilityCard key={capability.name} capability={capability} showActions />
-                ))}
-              </div>
-            </section>
-          </>
+            <div class='rounded-2xl border border-slate-700/60 bg-slate-900/60 p-4 text-slate-300'>
+              Want it faster? Email{' '}
+              <a
+                href='mailto:support@fathym.com?subject=Private%20CALZ%20Setup'
+                class='font-semibold text-sky-300 hover:text-sky-200'
+              >
+                support@fathym.com
+              </a>{' '}
+              and the team will help provision it today.
+            </div>
+          </section>
         )}
       </div>
     </Modal>
