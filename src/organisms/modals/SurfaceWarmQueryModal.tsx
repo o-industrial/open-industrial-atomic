@@ -156,7 +156,9 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
       if (isAziStreamingRef.current && dq && dq !== cq) {
         applyAziDataQuery(dq);
       }
-    } catch {}
+    } catch {
+      console.log('Error: state change');
+    }
     if (!isLoading) return;
 
     const err = (state as any)?.Error;
@@ -294,7 +296,9 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
 
     const baseDefault = 'Devices\n| take 10';
     const deviceDefault = defaultDeviceIds.length
-      ? `Devices\n| where DeviceID in (${defaultDeviceIds.map((id) => `"${id}"`).join(', ')})\n| take 10`
+      ? `Devices\n| where DeviceID in (${
+        defaultDeviceIds.map((id) => `"${id}"`).join(', ')
+      })\n| take 10`
       : baseDefault;
     const nextDefault = hasDataConnections ? deviceDefault : baseDefault;
     const shouldApply = query.trim().length === 0 || autoAppliedQueryRef.current === query;

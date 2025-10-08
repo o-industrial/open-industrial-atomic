@@ -1,5 +1,5 @@
 import { IntentTypes, JSX, useEffect, useRef, useState } from '../../.deps.ts';
-import { Action, ActionStyleTypes, Input, SendIcon, RedoIcon } from '../../.exports.ts';
+import { Action, ActionStyleTypes, Input, RedoIcon, SendIcon } from '../../.exports.ts';
 
 export type AziChatInputProps = {
   placeholder?: string;
@@ -21,10 +21,10 @@ export function AziChatInput({
   inputIntentType = IntentTypes.None,
   actionIntentType = IntentTypes.Primary,
   sendIcon = <SendIcon class='w-5 h-5' />,
-  redoIcon = <RedoIcon class="w-5 h-5" />,
+  redoIcon = <RedoIcon class='w-5 h-5' />,
   maxHeight = 50,
   extraInputs = {},
-  onReset
+  onReset,
 }: AziChatInputProps): JSX.Element {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
@@ -100,21 +100,21 @@ export function AziChatInput({
         class='flex-grow resize-none overflow-hidden'
       />
 
-<div class="flex items-stretch gap-1">
+      <div class='flex items-stretch gap-1'>
         <Action
-          type="submit"
+          type='submit'
           styleType={ActionStyleTypes.Solid | ActionStyleTypes.Thin}
           intentType={actionIntentType}
           disabled={isDisabled}
-          class="text-xs px-3"
-          title="Send"
+          class='text-xs px-3'
+          title='Send'
         >
           {sendIcon}
         </Action>
 
         {onReset && (
           <Action
-            type="button"
+            type='button'
             onClick={async () => {
               if (isDisabled) return;
               setResetting(true);
@@ -127,8 +127,8 @@ export function AziChatInput({
             styleType={ActionStyleTypes.Solid | ActionStyleTypes.Thin}
             intentType={IntentTypes.Primary}
             disabled={isDisabled}
-            class="text-xs px-3"
-            title="Reset Chat"
+            class='text-xs px-3'
+            title='Reset Chat'
           >
             {redoIcon}
           </Action>
