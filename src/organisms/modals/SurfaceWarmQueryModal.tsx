@@ -76,7 +76,9 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
     setIsLoading(false);
     if (state && state.DataQuery && state.DataQuery != state.CurrentQuery) {
       setQuery(state.DataQuery as string);
-      setActiveTabKey('query');
+      if (activeTabKey !== 'results') {
+        setActiveTabKey('query');
+      }
     }
 
     // Append final banner without overwriting any streamed error history
@@ -107,7 +109,9 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
       const cq = (state as any)?.CurrentQuery as string | undefined;
       if (dq && dq !== cq) {
         setQuery(dq);
-        setActiveTabKey('query');
+        if (activeTabKey !== 'results') {
+          setActiveTabKey('query');
+        }
       }
     } catch {}
     if (!isLoading) return;

@@ -28,6 +28,7 @@ export function AziChatInput({
 }: AziChatInputProps): JSX.Element {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const minHeightRef = useRef<number | null>(null);
 
@@ -53,7 +54,7 @@ export function AziChatInput({
 
   const sendNow = async () => {
     const trimmed = input.trim();
-    if (!trimmed || sending || disabled) return;
+    if (!trimmed || sending || resetting || disabled) return;
 
     setSending(true);
     try {
@@ -82,7 +83,7 @@ export function AziChatInput({
     resizeTextarea();
   }, [input]);
 
-  const isDisabled = disabled || sending;
+  const isDisabled = disabled || sending || resetting;
 
   return (
     <form onSubmit={handleSubmit} class='flex gap-2 w-full'>
@@ -114,11 +115,13 @@ export function AziChatInput({
         {onReset && (
           <Action
             type="button"
-            onClick={() => {
+            onClick={async () => {
               if (isDisabled) return;
-              const result = onReset();
-              if (result && typeof (result as Promise<void>).then === 'function') {
-                (result as Promise<void>).catch(() => {});
+              setResetting(true);
+              try {
+                await Promise.resolve(onReset?.());
+              } finally {
+                setResetting(false);
               }
             }}
             styleType={ActionStyleTypes.Solid | ActionStyleTypes.Thin}
