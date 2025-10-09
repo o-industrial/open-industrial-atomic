@@ -336,10 +336,12 @@ export function PrivateCALZModal({
               </div>
               <h4 class='text-base font-semibold text-amber-100'>Workspace cloud required</h4>
               <p class='mt-2 text-sm text-amber-100/80'>
-                No workspace cloud is configured yet. Connect Azure under Environment -{'>'} Cloud Connections to unlock private CALZ automation.
+                No workspace cloud is configured yet. Connect Azure under Environment -{'>'}{' '}
+                Cloud Connections to unlock private CALZ automation.
               </p>
               <p class='mt-3 text-sm text-amber-100/90'>
-                While that&apos;s provisioning, capture the readiness details below so Key Vault, logging, and governance can land smoothly once connected.
+                While that&apos;s provisioning, capture the readiness details below so Key Vault,
+                logging, and governance can land smoothly once connected.
               </p>
             </div>
 
@@ -349,10 +351,14 @@ export function PrivateCALZModal({
                   key={item.title}
                   class='relative overflow-hidden rounded-3xl border border-slate-700/50 bg-slate-900/70 p-5 shadow-lg'
                 >
-                  <div class={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${item.accent} opacity-80`}>
+                  <div
+                    class={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${item.accent} opacity-80`}
+                  >
                   </div>
                   <div class='flex items-start gap-3'>
-                    <div class={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${item.accent} text-slate-900 shadow-md`}>
+                    <div
+                      class={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${item.accent} text-slate-900 shadow-md`}
+                    >
                       {item.icon}
                     </div>
                     <div class='space-y-1'>

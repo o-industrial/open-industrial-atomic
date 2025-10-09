@@ -18,7 +18,8 @@ const flowOptions: FlowOption[] = [
   {
     key: 'warm',
     label: 'Warm path',
-    description: 'Operational storage with ADX and enriched transformations for analytics workloads.',
+    description:
+      'Operational storage with ADX and enriched transformations for analytics workloads.',
   },
   {
     key: 'cold',
@@ -38,7 +39,8 @@ const fabricHighlights: FabricHighlight[] = [
   {
     title: 'IoT Hub & DPS',
     accent: 'from-sky-500/70 via-indigo-500/70 to-cyan-400/70',
-    description: 'Scale device onboarding with per-tenant enrollment groups and plug secure tunnel options into your fleet tooling.',
+    description:
+      'Scale device onboarding with per-tenant enrollment groups and plug secure tunnel options into your fleet tooling.',
     icon: (
       <svg viewBox='0 0 24 24' fill='none' class='h-6 w-6'>
         <path
@@ -66,7 +68,8 @@ const fabricHighlights: FabricHighlight[] = [
   {
     title: 'Data Explorer',
     accent: 'from-emerald-500/70 via-teal-500/70 to-sky-400/70',
-    description: 'Shape ADX databases for warm telemetry, retention policies, and near real-time analytics queries.',
+    description:
+      'Shape ADX databases for warm telemetry, retention policies, and near real-time analytics queries.',
     icon: (
       <svg viewBox='0 0 24 24' fill='none' class='h-6 w-6'>
         <path
@@ -85,7 +88,8 @@ const fabricHighlights: FabricHighlight[] = [
   {
     title: 'Transformations',
     accent: 'from-fuchsia-500/70 via-violet-500/70 to-sky-500/70',
-    description: 'Pre-wire Stream Analytics or Functions to shape payloads before they land in business systems.',
+    description:
+      'Pre-wire Stream Analytics or Functions to shape payloads before they land in business systems.',
     icon: (
       <svg viewBox='0 0 24 24' fill='none' class='h-6 w-6'>
         <path
@@ -187,15 +191,29 @@ export function ManageIoTModal({
         <section class='relative overflow-hidden rounded-3xl border border-slate-700/60 bg-gradient-to-br from-slate-900/60 via-slate-900/30 to-slate-900/60 p-8 shadow-2xl'>
           <div class='relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'>
             <div class='space-y-4'>
-              <span class={`inline-flex items-center gap-2 self-start rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${hasWorkspaceCloud ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200' : 'border-amber-400/40 bg-amber-500/10 text-amber-200'}`}>
-                <span class='inline-flex h-2 w-2 rounded-full bg-current shadow-[0_0_8px_rgb(56_189_248/0.75)]'></span>
+              <span
+                class={`inline-flex items-center gap-2 self-start rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${
+                  hasWorkspaceCloud
+                    ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200'
+                    : 'border-amber-400/40 bg-amber-500/10 text-amber-200'
+                }`}
+              >
+                <span class='inline-flex h-2 w-2 rounded-full bg-current shadow-[0_0_8px_rgb(56_189_248/0.75)]'>
+                </span>
                 {heroPill}
               </span>
               <h3 class='text-3xl font-semibold text-white md:text-4xl'>{heroTitle}</h3>
               <p class='max-w-3xl text-base leading-relaxed text-slate-300'>{heroDescription}</p>
             </div>
             <div class='relative isolate mt-4 flex h-28 w-full max-w-xs items-center justify-center lg:mt-0'>
-              <div class={`absolute inset-0 rounded-full blur-2xl bg-gradient-to-tr ${hasWorkspaceCloud ? 'from-emerald-400/40 via-teal-300/30 to-sky-400/40' : 'from-amber-400/40 via-orange-400/40 to-pink-400/40'}`}></div>
+              <div
+                class={`absolute inset-0 rounded-full blur-2xl bg-gradient-to-tr ${
+                  hasWorkspaceCloud
+                    ? 'from-emerald-400/40 via-teal-300/30 to-sky-400/40'
+                    : 'from-amber-400/40 via-orange-400/40 to-pink-400/40'
+                }`}
+              >
+              </div>
               <div class='relative flex h-24 w-24 items-center justify-center rounded-2xl bg-slate-900/70 backdrop-blur ring-1 ring-sky-400/60'>
                 <svg viewBox='0 0 32 32' class='h-12 w-12 text-sky-200'>
                   <path
@@ -224,7 +242,9 @@ export function ManageIoTModal({
               key={item.title}
               class='group relative overflow-hidden rounded-3xl border border-slate-700/50 bg-slate-900/70 p-6 shadow-xl transition-transform duration-300 hover:-translate-y-1 hover:border-slate-500/60'
             >
-              <div class={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${item.accent} opacity-80`}>
+              <div
+                class={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${item.accent} opacity-80`}
+              >
               </div>
               <div class='relative flex items-start gap-4'>
                 <div
@@ -243,13 +263,15 @@ export function ManageIoTModal({
 
         {!hasWorkspaceCloud && (
           <div class='relative overflow-hidden rounded-3xl border border-amber-400/60 bg-amber-500/10 p-6 text-amber-100 shadow-xl'>
-            <div class='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-amber-400/60 via-orange-400/50 to-pink-400/60 opacity-70'></div>
+            <div class='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-amber-400/60 via-orange-400/50 to-pink-400/60 opacity-70'>
+            </div>
             <h4 class='text-base font-semibold text-amber-100'>Workspace cloud required</h4>
             <p class='mt-2 text-sm text-amber-100/80'>
               Connect Azure under Environment -{'>'} Cloud Connections to unlock IoT provisioning.
             </p>
             <p class='mt-3 text-sm text-amber-100/90'>
-              Capture desired IoT Hub naming, DPS enrollment strategy, and data flow targets while the connection is being established.
+              Capture desired IoT Hub naming, DPS enrollment strategy, and data flow targets while
+              the connection is being established.
             </p>
           </div>
         )}
@@ -349,19 +371,33 @@ export function ManageIoTModal({
                   </div>
                   <div class='flex items-center justify-between'>
                     <span>Device Provisioning</span>
-                    <span class={useDps ? (iotDone ? 'text-emerald-300' : 'text-slate-400') : 'text-slate-500'}>
+                    <span
+                      class={useDps
+                        ? (iotDone ? 'text-emerald-300' : 'text-slate-400')
+                        : 'text-slate-500'}
+                    >
                       {useDps ? (iotDone ? 'Online' : 'Queued') : 'Disabled'}
                     </span>
                   </div>
                   <div class='flex items-center justify-between'>
                     <span>ADX databases</span>
-                    <span class={selectedFlows.some((f) => f.key !== 'hot') ? (iotDone ? 'text-emerald-300' : 'text-slate-400') : 'text-slate-500'}>
-                      {selectedFlows.some((f) => f.key !== 'hot') ? (iotDone ? 'Linked' : 'Pending') : 'Not requested'}
+                    <span
+                      class={selectedFlows.some((f) => f.key !== 'hot')
+                        ? (iotDone ? 'text-emerald-300' : 'text-slate-400')
+                        : 'text-slate-500'}
+                    >
+                      {selectedFlows.some((f) => f.key !== 'hot')
+                        ? (iotDone ? 'Linked' : 'Pending')
+                        : 'Not requested'}
                     </span>
                   </div>
                   <div class='flex items-center justify-between'>
                     <span>Edge modules</span>
-                    <span class={useEdgeModules ? (iotDone ? 'text-emerald-300' : 'text-slate-400') : 'text-slate-500'}>
+                    <span
+                      class={useEdgeModules
+                        ? (iotDone ? 'text-emerald-300' : 'text-slate-400')
+                        : 'text-slate-500'}
+                    >
                       {useEdgeModules ? (iotDone ? 'Published' : 'Staging') : 'Not included'}
                     </span>
                   </div>

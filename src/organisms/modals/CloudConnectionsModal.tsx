@@ -20,52 +20,52 @@ type CloudHighlight = {
 };
 
 const cloudHighlights: CloudHighlight[] = [
-  {
-    title: 'Managed Azure in Minutes',
-    description:
-      'Spin up an industrial-ready subscription that is curated, billed, and secured by Open Industrial without leaving this flow.',
-    accent: 'from-sky-500/70 via-cyan-400/70 to-emerald-400/70',
-    icon: (
-      <svg viewBox='0 0 24 24' fill='none' class='h-6 w-6'>
-        <path
-          d='M5 15.5A4.5 4.5 0 0 1 9.5 11h.8A5.7 5.7 0 0 1 20 13.9a3.6 3.6 0 0 1-3.6 3.6H7.2A2.2 2.2 0 0 1 5 15.5Z'
-          stroke='currentColor'
-          stroke-width='1.6'
-          stroke-linecap='round'
-          stroke-linejoin='round'
-        />
-        <path
-          d='M9 8.5A3.5 3.5 0 0 1 15.1 7'
-          stroke='currentColor'
-          stroke-width='1.6'
-          stroke-linecap='round'
-        />
-      </svg>
-    ),
-  },
-  {
-    title: 'Bring Your Subscription',
-    description:
-      'Authenticate with Azure once, then choose existing subscriptions, create new ones, or stitch in service principals securely.',
-    accent: 'from-indigo-500/70 via-sky-500/70 to-cyan-400/70',
-    icon: (
-      <svg viewBox='0 0 24 24' fill='none' class='h-6 w-6'>
-        <path
-          d='M8 12a4 4 0 1 1 4 4H9l-3 2v-2.5a4 4 0 0 1 2-3.5'
-          stroke='currentColor'
-          stroke-width='1.6'
-          stroke-linecap='round'
-          stroke-linejoin='round'
-        />
-        <path
-          d='M15 6h4M17 4v4'
-          stroke='currentColor'
-          stroke-width='1.6'
-          stroke-linecap='round'
-        />
-      </svg>
-    ),
-  },
+  // {
+  //   title: 'Managed Azure Subscription',
+  //   description:
+  //     'Spin up a managed Azure tenant in minutes. Open Industrial provisions, secures, and keeps the subscription compliant with automatic credential rotation.',
+  //   accent: 'from-sky-500/70 via-cyan-400/70 to-emerald-400/70',
+  //   icon: (
+  //     <svg viewBox='0 0 24 24' fill='none' class='h-6 w-6'>
+  //       <path
+  //         d='M5 15.5A4.5 4.5 0 0 1 9.5 11h.8A5.7 5.7 0 0 1 20 13.9a3.6 3.6 0 0 1-3.6 3.6H7.2A2.2 2.2 0 0 1 5 15.5Z'
+  //         stroke='currentColor'
+  //         stroke-width='1.6'
+  //         stroke-linecap='round'
+  //         stroke-linejoin='round'
+  //       />
+  //       <path
+  //         d='M9 8.5A3.5 3.5 0 0 1 15.1 7'
+  //         stroke='currentColor'
+  //         stroke-width='1.6'
+  //         stroke-linecap='round'
+  //       />
+  //     </svg>
+  //   ),
+  // },
+  // {
+  //   title: 'Bring Your Own Azure Cloud',
+  //   description:
+  //     'Authenticate once and connect the subscription that fits your governance model—select existing tenants, create new ones, or register service principals securely.',
+  //   accent: 'from-indigo-500/70 via-sky-500/70 to-cyan-400/70',
+  //   icon: (
+  //     <svg viewBox='0 0 24 24' fill='none' class='h-6 w-6'>
+  //       <path
+  //         d='M8 12a4 4 0 1 1 4 4H9l-3 2v-2.5a4 4 0 0 1 2-3.5'
+  //         stroke='currentColor'
+  //         stroke-width='1.6'
+  //         stroke-linecap='round'
+  //         stroke-linejoin='round'
+  //       />
+  //       <path
+  //         d='M15 6h4M17 4v4'
+  //         stroke='currentColor'
+  //         stroke-width='1.6'
+  //         stroke-linecap='round'
+  //       />
+  //     </svg>
+  //   ),
+  // },
   {
     title: 'Telemetry-Ready Defaults',
     description:
@@ -89,7 +89,100 @@ const cloudHighlights: CloudHighlight[] = [
       </svg>
     ),
   },
+  {
+    title: 'OEM Integrations on Standby',
+    description:
+      'Unlock curated integrations like HighByte, Node-RED, Power BI, and Grafana. Once your cloud is connected, deploy and manage them directly from the OEM Integrations console.',
+    accent: 'from-emerald-500/70 via-teal-500/70 to-sky-400/70',
+    icon: (
+      <svg viewBox='0 0 24 24' fill='none' class='h-6 w-6'>
+        <path
+          d='M9 3h6l3 3v6l-3 3H9l-3-3V6l3-3Z'
+          stroke='currentColor'
+          stroke-width='1.6'
+          stroke-linejoin='round'
+        />
+        <path
+          d='M9 9h6v6H9z'
+          stroke='currentColor'
+          stroke-width='1.6'
+          stroke-linejoin='round'
+        />
+      </svg>
+    ),
+  },
 ];
+
+type ConnectionOptionCardProps = {
+  accent: string;
+  icon: JSX.Element;
+  title: string;
+  description: string;
+  children: JSX.Element | JSX.Element[];
+};
+
+function ConnectionOptionCard({
+  accent,
+  icon,
+  title,
+  description,
+  children,
+}: ConnectionOptionCardProps): JSX.Element {
+  return (
+    <div class='relative overflow-hidden rounded-3xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-xl'>
+      <div class={`absolute inset-x-0 top-0 h-px bg-gradient-to-r ${accent} opacity-80`}>
+      </div>
+      <div class='flex items-start gap-4'>
+        <div class='flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-900/70 ring-1 ring-slate-700/80'>
+          {icon}
+        </div>
+        <div class='space-y-3'>
+          <div class='space-y-1'>
+            <h3 class='text-lg font-semibold text-white'>{title}</h3>
+            <p class='text-sm text-slate-300'>{description}</p>
+          </div>
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const managedFeatures = [
+  'Provision a production-ready subscription in minutes',
+  'Managed tenant curated for industrial workloads',
+  'Secrets rotated automatically with every renewal',
+  'Shared governance guardrails maintained by Open Industrial',
+] as const;
+
+const managedIcon = (
+  <svg viewBox='0 0 24 24' fill='none' class='h-7 w-7 text-sky-300'>
+    <path
+      d='M6 9a4 4 0 1 1 8 0v1h1a3 3 0 1 1 0 6h-1.2a3.8 3.8 0 0 1-6.6 0H6a3 3 0 0 1 0-6h0.2'
+      stroke='currentColor'
+      stroke-width='1.6'
+      stroke-linecap='round'
+      stroke-linejoin='round'
+    />
+  </svg>
+);
+
+const privateIcon = (
+  <svg viewBox='0 0 24 24' fill='none' class='h-7 w-7 text-indigo-300'>
+    <path
+      d='M4 6h16v12H4z'
+      stroke='currentColor'
+      stroke-width='1.6'
+      stroke-linejoin='round'
+    />
+    <path
+      d='M8 10h8M8 14h5'
+      stroke='currentColor'
+      stroke-width='1.6'
+      stroke-linecap='round'
+    />
+  </svg>
+);
 
 export type CloudConnectionsModalProps = {
   workspaceMgr: WorkspaceManager;
@@ -126,6 +219,8 @@ export function CloudConnectionsModal({
   const [managedError, setManagedError] = useState<string | undefined>(undefined);
   const authRefreshTimeout = useRef<number | undefined>(undefined);
   const [authInFlight, setAuthInFlight] = useState(false);
+
+  const connectionOptionCount = (canUseManaged ? 1 : 0) + (canUsePrivate ? 1 : 0);
 
   useEffect(() => {
     if (!IS_BROWSER) {
@@ -426,143 +521,153 @@ export function CloudConnectionsModal({
               </div>
             )}
 
-            {canUseManaged && (
-              <div class='relative overflow-hidden rounded-3xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-xl'>
-                <div class='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-sky-400/50 via-cyan-400/40 to-emerald-400/50 opacity-80'>
-                </div>
-                <div class='space-y-4'>
-                  <div class='space-y-2'>
-                    <h3 class='text-lg font-semibold text-white'>Managed Subscription</h3>
-                    <p class='text-sm text-slate-300'>
-                      Launch into our managed tenant. We provision and secure the subscription and
-                      rotate credentials with every renewal.
-                    </p>
-                  </div>
-                  <div class='flex flex-wrap gap-2'>
-                    <Action
-                      intentType={IntentTypes.Primary}
-                      styleType={ActionStyleTypes.Outline}
-                      disabled={creatingManaged}
-                      onClick={createManagedSubscription}
-                    >
-                      {creatingManaged ? 'Provisioning...' : 'Create Managed Subscription'}
-                    </Action>
-                    {managedError && <p class='w-full text-sm text-rose-300'>{managedError}</p>}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {canUsePrivate && (
-              <div class='relative overflow-hidden rounded-3xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-xl'>
-                <div class='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-indigo-400/50 via-sky-400/40 to-cyan-400/50 opacity-80'>
-                </div>
-                <div class='space-y-4'>
-                  <div class='space-y-2'>
-                    <h3 class='text-lg font-semibold text-white'>Private Azure Cloud</h3>
-                    <p class='text-sm text-slate-300'>
-                      Choose the path that fits your governance model.
-                    </p>
-                  </div>
-
-                  {loading && (
-                    <div class='flex items-center justify-center py-10'>
-                      <LoadingIcon class='h-10 w-10 animate-spin text-sky-300' />
+            {connectionOptionCount > 0 && (
+              <div class={`grid gap-6 ${connectionOptionCount > 1 ? 'lg:grid-cols-2' : ''}`}>
+                {canUseManaged && (
+                  <ConnectionOptionCard
+                    accent='from-sky-400/50 via-cyan-400/40 to-emerald-400/50'
+                    icon={managedIcon}
+                    title='Managed Azure Subscription'
+                    description='Launch into our managed tenant in minutes—Open Industrial provisions, secures, and keeps the subscription compliant with automatic credential rotation.'
+                  >
+                    <div class='space-y-4'>
+                      <ul class='space-y-2 text-sm text-slate-300'>
+                        {managedFeatures.map((feature) => (
+                          <li class='flex items-start gap-2' key={feature}>
+                            <span class='mt-1 h-1.5 w-1.5 rounded-full bg-sky-400'></span>
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <div class='flex flex-wrap gap-2'>
+                        <Action
+                          intentType={IntentTypes.Primary}
+                          styleType={ActionStyleTypes.Outline}
+                          disabled={creatingManaged}
+                          onClick={createManagedSubscription}
+                        >
+                          {creatingManaged ? 'Provisioning...' : 'Create Managed Subscription'}
+                        </Action>
+                        {managedError && <p class='w-full text-sm text-rose-300'>{managedError}</p>}
+                      </div>
                     </div>
-                  )}
+                  </ConnectionOptionCard>
+                )}
 
-                  {!loading && !isAzureConnected && (
-                    <div class='space-y-4 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-4'>
-                      <p class='text-sm text-slate-300'>
-                        Sign in with Microsoft to let Open Industrial discover subscriptions and
-                        help create the necessary service principals.
-                      </p>
-                      <CloudConnectAzureForm
-                        action='/azure/oauth/signin'
-                        data-eac-bypass-base
-                        actionText='Sign in with Microsoft'
-                        submitDisabled={authInFlight}
-                        onSubmitCapture={() => {
-                          setAuthInFlight(true);
+                {canUsePrivate && (
+                  <ConnectionOptionCard
+                    accent='from-indigo-400/50 via-sky-400/40 to-cyan-400/50'
+                    icon={privateIcon}
+                    title='Private Azure Cloud'
+                    description='Authenticate once and connect your own subscription—select existing tenants, create new ones, or register service principals to match your governance model.'
+                  >
+                    <div class='space-y-4'>
+                      {loading && (
+                        <div class='flex items-center justify-center py-10'>
+                          <LoadingIcon class='h-10 w-10 animate-spin text-sky-300' />
+                        </div>
+                      )}
 
-                          if (!IS_BROWSER) {
-                            refreshAzureStatus();
-                            return;
-                          }
+                      {!loading && !isAzureConnected && (
+                        <div class='space-y-4 rounded-2xl border border-slate-700/60 bg-slate-900/60 p-4'>
+                          <p class='text-sm text-slate-300'>
+                            Sign in with Microsoft so Open Industrial can discover subscriptions and
+                            stage the required service principals.
+                          </p>
+                          <CloudConnectAzureForm
+                            action='./azure/oauth/signin'
+                            data-eac-bypass-base
+                            actionText='Sign in with Microsoft'
+                            submitDisabled={authInFlight}
+                            onSubmitCapture={() => {
+                              setAuthInFlight(true);
 
-                          if (authRefreshTimeout.current !== undefined) {
-                            clearTimeout(authRefreshTimeout.current);
-                          }
+                              if (!IS_BROWSER) {
+                                refreshAzureStatus();
+                                return;
+                              }
 
-                          authRefreshTimeout.current = setTimeout(() => {
-                            authRefreshTimeout.current = undefined;
-                            setAuthInFlight(false);
-                            refreshAzureStatus();
-                          }, 5000);
-                        }}
-                      />
-                      {authInFlight && (
-                        <p class='text-xs text-slate-400'>
-                          Complete the Microsoft sign-in popup to continue.
-                        </p>
+                              if (authRefreshTimeout.current !== undefined) {
+                                clearTimeout(authRefreshTimeout.current);
+                              }
+
+                              authRefreshTimeout.current = setTimeout(() => {
+                                authRefreshTimeout.current = undefined;
+                                setAuthInFlight(false);
+                                refreshAzureStatus();
+                              }, 5000);
+                            }}
+                          />
+                          {authInFlight && (
+                            <p class='text-xs text-slate-400'>
+                              Complete the Microsoft sign-in popup to continue.
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {!loading && isAzureConnected && (
+                        <div class='space-y-4'>
+                          <div class='rounded-2xl border border-slate-700/60 bg-slate-900/60 p-4'>
+                            <TabbedPanel
+                              tabs={[
+                                {
+                                  key: 'existing',
+                                  label: 'Select Subscription',
+                                  content: (
+                                    <EaCSelectSubscriptionForm
+                                      data-eac-bypass-base
+                                      entLookup={entLookup}
+                                      cloudLookup=''
+                                    />
+                                  ),
+                                },
+                                {
+                                  key: 'create',
+                                  label: 'Create Subscription',
+                                  content: (
+                                    <EaCCreateSubscriptionForm
+                                      data-eac-bypass-base
+                                      entLookup={entLookup}
+                                      cloudLookup=''
+                                    />
+                                  ),
+                                },
+                                {
+                                  key: 'manual',
+                                  label: 'Manual (IDs + Secret)',
+                                  content: (
+                                    <EaCManageCloudForm
+                                      action='/workspace/api/o-industrial/eac/clouds'
+                                      data-eac-bypass-base
+                                      entLookup={entLookup}
+                                      cloudLookup=''
+                                    />
+                                  ),
+                                },
+                              ]}
+                            />
+                          </div>
+                          <p class='text-xs text-slate-400'>
+                            Tip: capture subscription owners in your runbook so CALZ automation can
+                            assign access consistently.
+                          </p>
+                        </div>
+                      )}
+
+                      {workspaceCloudDetails && (
+                        <div class='flex flex-wrap gap-2'>
+                          <Action
+                            styleType={ActionStyleTypes.Outline}
+                            onClick={() => setMode('summary')}
+                          >
+                            Back to Overview
+                          </Action>
+                        </div>
                       )}
                     </div>
-                  )}
-
-                  {!loading && isAzureConnected && (
-                    <div class='rounded-2xl border border-slate-700/60 bg-slate-900/60 p-4'>
-                      <TabbedPanel
-                        tabs={[
-                          {
-                            key: 'existing',
-                            label: 'Select Subscription',
-                            content: (
-                              <EaCSelectSubscriptionForm
-                                data-eac-bypass-base
-                                entLookup={entLookup}
-                                cloudLookup=''
-                              />
-                            ),
-                          },
-                          {
-                            key: 'create',
-                            label: 'Create Subscription',
-                            content: (
-                              <EaCCreateSubscriptionForm
-                                data-eac-bypass-base
-                                entLookup={entLookup}
-                                cloudLookup=''
-                              />
-                            ),
-                          },
-                          {
-                            key: 'manual',
-                            label: 'Manual (IDs + Secret)',
-                            content: (
-                              <EaCManageCloudForm
-                                action='/workspace/api/o-industrial/eac/clouds'
-                                data-eac-bypass-base
-                                entLookup={entLookup}
-                                cloudLookup=''
-                              />
-                            ),
-                          },
-                        ]}
-                      />
-                    </div>
-                  )}
-
-                  {workspaceCloudDetails && (
-                    <div class='flex flex-wrap gap-2'>
-                      <Action
-                        styleType={ActionStyleTypes.Outline}
-                        onClick={() => setMode('summary')}
-                      >
-                        Back to Overview
-                      </Action>
-                    </div>
-                  )}
-                </div>
+                  </ConnectionOptionCard>
+                )}
               </div>
             )}
           </section>
