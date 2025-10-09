@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import { marked } from 'npm:marked@15.0.1';
-import { useEffect, useRef, useState } from 'npm:preact@10.20.1/hooks';
+import { useEffect, useMemo, useRef, useState } from 'npm:preact@10.20.1/hooks';
 import type { FunctionalComponent } from 'npm:preact@10.20.1';
 import { SurfaceWarmQueryModalQuery } from './SurfaceWarmQueryModalQuery.tsx';
 import { SurfaceWarmQueryModalResults } from './SurfaceWarmQueryModalResults.tsx';
@@ -9,6 +9,21 @@ import { AziPanel } from '../AziPanel.tsx';
 import { Modal } from '../../molecules/Modal.tsx';
 import { TabbedPanel } from '../../molecules/TabbedPanel.tsx';
 import { Action } from '../../atoms/Action.tsx';
+
+const shaHash = async (workspaceLookup: string, id: string): Promise<string> => {
+  if (!workspaceLookup || !id) return id;
+  const subtle = globalThis.crypto?.subtle;
+  if (!subtle) return id;
+  try {
+    const encoded = new TextEncoder().encode(`${workspaceLookup}:${id}`);
+    const digest = await subtle.digest('SHA-256', encoded);
+    return Array.from(new Uint8Array(digest))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+  } catch {
+    return id;
+  }
+};
 
 interface SurfaceWarmQueryModalProps {
   workspace: WorkspaceManager;
@@ -31,16 +46,22 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
   aziExtraInputs,
   warmQueryLookup,
 }) => {
+  const userEditedRef = useRef(false);
+  const autoAppliedQueryRef = useRef<string | null>(null);
   const [query, setQuery] = useState(initialQuery);
   type QueryResultRow = Record<string, unknown>;
   const [queryResults, setQueryResults] = useState<QueryResultRow[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTabKey, setActiveTabKey] = useState('query');
   const [errors, setErrors] = useState('');
+  const eac = workspace.UseEaC();
+  const [defaultDeviceIds, setDefaultDeviceIds] = useState<string[]>([]);
 
   const isRunDisabled = !query || isLoading;
 
   const seenFirstErrorRef = useRef(false);
+  const isAziStreamingRef = useRef(false);
+  const streamBaselineDataQueryRef = useRef<string | undefined>(undefined);
 
   // Debounced persistence of Query edits back to EaC so main Save commits them
   const persistTimerRef = useRef<number | null>(null);
@@ -72,11 +93,34 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  const onAziFinishSend = (state: AziState) => {
-    setIsLoading(false);
-    if (state && state.DataQuery && state.DataQuery != state.CurrentQuery) {
-      setQuery(state.DataQuery as string);
+  const applyAziDataQuery = (next?: string) => {
+    if (!next) return;
+    const baseline = streamBaselineDataQueryRef.current;
+    if (baseline !== undefined && baseline === next) {
+      return;
+    }
+
+    streamBaselineDataQueryRef.current = next;
+    setQuery(next);
+    userEditedRef.current = true;
+    autoAppliedQueryRef.current = null;
+    if (activeTabKey !== 'results') {
       setActiveTabKey('query');
+    }
+  };
+
+  const onAziFinishSend = (state?: AziState) => {
+    const wasStreaming = isAziStreamingRef.current;
+    isAziStreamingRef.current = false;
+    setIsLoading(false);
+    if (
+      wasStreaming &&
+      state &&
+      state.DataQuery &&
+      state.DataQuery != state.CurrentQuery
+    ) {
+      const nextQuery = typeof state.DataQuery === 'string' ? state.DataQuery : undefined;
+      applyAziDataQuery(nextQuery);
     }
 
     // Append final banner without overwriting any streamed error history
@@ -91,6 +135,10 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
       lastAppendedErrorRef.current = undefined;
       lastAppendedErrorCodeRef.current = undefined;
       lastAppendedDataQueryRef.current = undefined;
+      isAziStreamingRef.current = false;
+      streamBaselineDataQueryRef.current = undefined;
+      userEditedRef.current = false;
+      autoAppliedQueryRef.current = null;
     } catch (err) {
       console.log(err);
     }
@@ -102,7 +150,15 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
   const lastAppendedDataQueryRef = useRef<string | undefined>(undefined);
 
   const onAziStateChange = (state: AziState) => {
-    // Ignore hydrated errors from initial Peek; only append during an active send
+    try {
+      const dq = (state as any)?.DataQuery as string | undefined;
+      const cq = (state as any)?.CurrentQuery as string | undefined;
+      if (isAziStreamingRef.current && dq && dq !== cq) {
+        applyAziDataQuery(dq);
+      }
+    } catch {
+      console.log('Error: state change');
+    }
     if (!isLoading) return;
 
     const err = (state as any)?.Error;
@@ -122,7 +178,10 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
 
     setErrors((prev) => {
       const lead = prev ? prev + '\n\n' : '';
-      setQuery(dataQuery);
+      if (isAziStreamingRef.current) {
+        const nextQuery = typeof dataQuery === 'string' ? dataQuery : undefined;
+        applyAziDataQuery(nextQuery);
+      }
       if (!seenFirstErrorRef.current) {
         // First error of this run: plain
         seenFirstErrorRef.current = true;
@@ -138,7 +197,10 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
     });
   };
 
-  const onAziStartSend = () => {
+  const onAziStartSend = (initialState?: AziState) => {
+    const initialDataQuery = (initialState as any)?.DataQuery as string | undefined;
+    streamBaselineDataQueryRef.current = initialDataQuery ?? undefined;
+    isAziStreamingRef.current = true;
     setIsLoading(true);
     setActiveTabKey('query');
     setErrors('> Azi Thinking...');
@@ -149,6 +211,8 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
   };
 
   const handleRunClick = async () => {
+    isAziStreamingRef.current = false;
+    streamBaselineDataQueryRef.current = undefined;
     setActiveTabKey('query');
     setErrors('> Executing Query...');
     setIsLoading(true);
@@ -177,6 +241,81 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
     setErrors('');
   }, []);
 
+  const connectionLookups = useMemo(() => {
+    if (!eac?.Surfaces) return [] as string[];
+    for (const surface of Object.values(eac.Surfaces)) {
+      const warmSettings = surface?.WarmQueries?.[warmQueryLookup];
+      if (!warmSettings) continue;
+      const dedup = new Set<string>();
+      for (const raw of warmSettings.DataConnectionLookups ?? []) {
+        if (!raw) continue;
+        const trimmed = raw.trim();
+        if (!trimmed) continue;
+        const idx = trimmed.lastIndexOf('->');
+        const parsed = idx >= 0 ? trimmed.slice(idx + 2).trim() : trimmed;
+        if (parsed) dedup.add(parsed);
+      }
+      return Array.from(dedup);
+    }
+    return [] as string[];
+  }, [eac, warmQueryLookup]);
+
+  const hasDataConnections = connectionLookups.length > 0;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!hasDataConnections || !eac?.EnterpriseLookup) {
+      setDefaultDeviceIds([]);
+      return;
+    }
+
+    (async () => {
+      try {
+        const hashed = await Promise.all(
+          connectionLookups.map((lookup) => shaHash(eac.EnterpriseLookup as string, lookup)),
+        );
+        const distinct = Array.from(new Set(hashed.filter(Boolean)));
+        if (!cancelled) {
+          setDefaultDeviceIds(distinct);
+        }
+      } catch {
+        if (!cancelled) {
+          setDefaultDeviceIds([]);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [connectionLookups, hasDataConnections, eac?.EnterpriseLookup]);
+
+  useEffect(() => {
+    if (userEditedRef.current) return;
+
+    const baseDefault = 'Devices\n| take 10';
+    const deviceDefault = defaultDeviceIds.length
+      ? `Devices\n| where DeviceID in (${
+        defaultDeviceIds.map((id) => `"${id}"`).join(', ')
+      })\n| take 10`
+      : baseDefault;
+    const nextDefault = hasDataConnections ? deviceDefault : baseDefault;
+    const shouldApply = query.trim().length === 0 || autoAppliedQueryRef.current === query;
+
+    if (!shouldApply) return;
+    if (query === nextDefault) {
+      autoAppliedQueryRef.current = nextDefault;
+      return;
+    }
+
+    autoAppliedQueryRef.current = nextDefault;
+    setQuery(nextDefault);
+  }, [defaultDeviceIds, hasDataConnections, query]);
+
+  const coerceQueryValue = (val: string | { currentTarget?: { value?: string } }): string =>
+    typeof val === 'string' ? val : val?.currentTarget?.value ?? '';
+
   const tabData = [
     {
       key: 'query',
@@ -195,11 +334,10 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
         <SurfaceWarmQueryModalQuery
           query={query}
           onQueryChange={(val) => {
-            setQuery(
-              typeof val === 'string' ? val : (val as any).currentTarget?.value ?? '',
-            );
-            // Normalize string value for persistence
-            const next = typeof val === 'string' ? val : (val as any).currentTarget?.value ?? '';
+            userEditedRef.current = true;
+            autoAppliedQueryRef.current = null;
+            const next = coerceQueryValue(val as any);
+            setQuery(next);
             persistQuery(next);
           }}
           errors={errors}
@@ -236,7 +374,7 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
     <Modal
       title={`Query: ${queryName}`}
       onClose={onClose}
-      class='max-w-[1200px] border border-neutral-700 bg-neutral-900'
+      class='w-full max-w-[1200px] border border-neutral-700 bg-neutral-900'
       style={{ height: '90vh' }}
     >
       <div
@@ -290,7 +428,7 @@ export const SurfaceWarmQueryModal: FunctionalComponent<
         </div>
 
         {/* Right Side: AziPanel */}
-        <div class='w-1/3 border-l border-gray-700 pl-4 overflow-y-auto'>
+        <div class='w-1/3 min-h-0 border-l border-gray-700 pl-4'>
           <AziPanel
             workspaceMgr={workspace}
             onStartSend={onAziStartSend}
