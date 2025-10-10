@@ -5,28 +5,35 @@ export function AziPanelTemplate({
   children,
   input,
   onClose,
+  headerActions,
+  title = "AZI'S UNDERSTANDING",
 }: {
   children?: ComponentChildren;
   input?: ComponentChildren;
   onClose?: () => void;
+  headerActions?: ComponentChildren;
+  title?: string;
 }): JSX.Element {
   return (
     <aside class='relative w-full h-full flex flex-col bg-neutral-900'>
       {/* Sticky Header */}
-      <header class='sticky top-0 z-10 w-full px-4 py-2 bg-neutral-800 border-b border-neutral-700 flex items-center justify-between'>
+      <header class='sticky top-0 z-10 w-full px-4 py-2 bg-neutral-800 border-b border-neutral-700 flex items-center'>
         <h2 class='text-sm font-semibold tracking-wide text-white uppercase'>
-          Azi’s Understanding
+          {title}
         </h2>
 
-        {onClose && (
-          <Action
-            onClick={onClose}
-            styleType={ActionStyleTypes.Icon}
-            title='Close Panel'
-          >
-            ✕
-          </Action>
-        )}
+        <div class='flex items-center ml-auto' style={{ gap: '12px' }}>
+          {headerActions}
+          {onClose && (
+            <Action
+              onClick={onClose}
+              styleType={ActionStyleTypes.Icon}
+              title='Close Panel'
+            >
+              &times;
+            </Action>
+          )}
+        </div>
       </header>
 
       {/* Scrollable Message History */}

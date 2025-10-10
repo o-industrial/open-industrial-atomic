@@ -36,7 +36,9 @@ export function AziChatMessage({
   const containerAlign = isRight ? 'items-end' : 'items-start';
   const rowDirection = isRight ? 'flex-row-reverse' : 'flex-row';
 
-  const rendered = renderMessage ? renderMessage(content) : content;
+  const rendered = (renderMessage ? renderMessage(content) : content)
+    .replace(/\r?\n/g, '<br />')
+    .replace(/(<br \/>)+$/, '');
 
   return (
     <div {...rest} class={classSet(['flex', rootAlign], rest)}>
