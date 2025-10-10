@@ -12,7 +12,6 @@ Shared hooks, helpers, and constants that support the atomic component stack. Ut
 ## Project Map
 
 - `.exports.ts` - Curated export list for utils; ensure additions maintain backwards compatibility.
-- `buildLinearPath.ts`, `buildSmoothPath.ts`, `buildStepPath.ts` - SVG path helpers for visualization components.
 - `getIntentStyles.ts`, `neonColors.ts`, `impulseSourceColorMap.ts` - Styling and theming utilities.
 - `hooks/` - Collection of shared hooks; promote to higher-level packages if used outside atomic contexts.
 

@@ -23,12 +23,17 @@ export function CloudConnectAzureForm(
     class: className,
     onSubmit,
     ...rest
-  } = props as CloudConnectAzureFormProps & JSX.HTMLAttributes<HTMLFormElement> & {
-    class?: string;
-    onSubmit?: JSX.EventHandler<JSX.TargetedEvent<HTMLFormElement, SubmitEvent>>;
-  };
+  } = props as
+    & CloudConnectAzureFormProps
+    & JSX.HTMLAttributes<HTMLFormElement>
+    & {
+      class?: string;
+      onSubmit?: JSX.EventHandler<
+        JSX.TargetedEvent<HTMLFormElement, SubmitEvent>
+      >;
+    };
 
-  const formAction = providedAction ?? '/azure/oauth/signin';
+  const formAction = providedAction ?? './azure/oauth/signin';
 
   const handleSubmit = useCallback<
     JSX.EventHandler<JSX.TargetedEvent<HTMLFormElement, SubmitEvent>>
@@ -46,13 +51,12 @@ export function CloudConnectAzureForm(
         return;
       }
 
-      let targetUrl: URL;
+      const baseHref = typeof document !== 'undefined'
+        ? document.querySelector('base[href]')?.getAttribute('href') ?? undefined
+        : undefined;
+      const baseUrl = baseHref ? new URL(baseHref, location.origin) : undefined;
 
-      try {
-        targetUrl = new URL(formAction, location.origin);
-      } catch (_) {
-        targetUrl = new URL('/azure/oauth/signin', location.origin);
-      }
+      const targetUrl = new URL(formAction, baseUrl?.href ?? location.origin);
 
       if (!targetUrl.searchParams.has('success_url')) {
         targetUrl.searchParams.set('success_url', successPath);
@@ -94,10 +98,10 @@ export function CloudConnectAzureForm(
       action={formAction}
       onSubmit={handleSubmit}
       {...rest}
-      class={classSet([
-        'w-full max-w-sm md:max-w-md mx-auto py-3 mt-2',
-        className ?? '',
-      ], props)}
+      class={classSet(
+        ['w-full max-w-sm md:max-w-md mx-auto py-3 mt-2', className ?? ''],
+        props,
+      )}
     >
       <div class='flex flex-col gap-2 mb-4'>
         <label class='block uppercase tracking-wide font-bold text-lg'>
@@ -107,7 +111,9 @@ export function CloudConnectAzureForm(
       </div>
 
       <div class='flex flex-col gap-2'>
-        <Action type='submit' disabled={submitDisabled}>{actionText}</Action>
+        <Action type='submit' disabled={submitDisabled}>
+          {actionText}
+        </Action>
       </div>
     </form>
   );

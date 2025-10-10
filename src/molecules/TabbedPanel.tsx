@@ -38,7 +38,6 @@ export function TabbedPanel({
     if (isControlled) setSelected(activeTab!);
   }, [activeTab]);
 
-  const activeTabObj = tabs.find((t) => t.key === selected);
   const vertical = direction === 'vertical';
 
   return (
@@ -114,14 +113,24 @@ export function TabbedPanel({
       <div
         class={classSet([
           vertical ? 'flex-1 pl-4 overflow-y-auto' : '',
-          // In horizontal + sticky, let content take remaining space.
-          // Defer scrolling to inner tab content to avoid nested scroll height glitches.
           stickyTabs && !vertical ? 'flex-1 min-h-0 overflow-hidden' : '',
-          // Otherwise, allow optional scrolling when requested
           !stickyTabs && scrollableContent && !vertical ? 'overflow-y-auto' : '',
         ])}
       >
-        {activeTabObj?.content}
+        {tabs.map((tab) => (
+          <div
+            key={`tabpanel-${tab.key}`}
+            data-tabpanel={tab.key}
+            aria-hidden={selected !== tab.key}
+            class={classSet([
+              selected === tab.key ? 'h-full w-full' : 'hidden',
+              !vertical && scrollableContent ? 'h-full min-h-0 overflow-y-auto' : '',
+              vertical ? 'h-full' : '',
+            ])}
+          >
+            {tab.content}
+          </div>
+        ))}
       </div>
     </div>
   );
