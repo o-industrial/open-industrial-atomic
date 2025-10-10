@@ -3,8 +3,6 @@ export * from './forms/.exports.ts';
 export * from './Action.tsx';
 export * from './AgreementCheckbox.tsx';
 export * from './Badge.tsx';
-export * from './ConnectionInfoPanel.tsx';
-export * from './LineSparkSVG.tsx';
 export * from './LoadingSpinner.tsx';
 export * from './NodeHandle.tsx';
 export * from './NodeStatTile.tsx';
