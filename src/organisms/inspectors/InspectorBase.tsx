@@ -1,12 +1,5 @@
 import { classSet, ComponentChildren, IntentTypes, JSX } from '../../.deps.ts';
-import {
-  Action,
-  ActionStyleTypes,
-  DeleteIcon,
-  Icon,
-  LinePreviewWithValue,
-  ToggleCheckbox,
-} from '../../.exports.ts';
+import { Action, ActionStyleTypes, DeleteIcon, Icon, ToggleCheckbox } from '../../.exports.ts';
 
 export type InspectorBaseProps = {
   iconKey?: string;
@@ -31,10 +24,10 @@ export function InspectorBase({
   label,
   status = 'normal',
   children,
-  impulseRates,
-  impulseRateIntentType = IntentTypes.Tertiary,
-  yMin,
-  yMax,
+  impulseRates: _impulseRates,
+  impulseRateIntentType: _impulseRateIntentType = IntentTypes.Tertiary,
+  yMin: _yMin,
+  yMax: _yMax,
   enabled,
   onToggleEnabled,
   onDelete,
@@ -46,15 +39,6 @@ export function InspectorBase({
     error: 'text-neon-red-400',
     proposal: 'text-neon-cyan-400',
   }[status];
-
-  const currentRate = impulseRates?.at(-1) ?? null;
-
-  // Dynamic yMin/yMax if not provided
-  const computedYMin = yMin ?? (impulseRates?.length ? Math.min(...impulseRates) - 3 : 0);
-  const computedYMax = yMax ?? (impulseRates?.length ? Math.max(...impulseRates) + 3 : 100);
-
-  // Remove to turn back on impulse rates
-  impulseRates = undefined;
 
   return (
     <section
@@ -100,18 +84,6 @@ export function InspectorBase({
       <div class='flex-grow overflow-y-auto scrollbar-thin scrollbar-thumb-neon-cyan-700 scrollbar-track-transparent px-4 py-3 space-y-3'>
         {children}
       </div>
-
-      {impulseRates && (
-        <LinePreviewWithValue
-          class='flex'
-          label='Impulse Rate'
-          values={impulseRates}
-          currentValue={currentRate}
-          intent={impulseRateIntentType}
-          yMin={computedYMin}
-          yMax={computedYMax}
-        />
-      )}
     </section>
   );
 }
