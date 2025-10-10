@@ -12,7 +12,9 @@ import {
   type NodeChange,
   ReactFlow,
   ReactFlowProvider,
+  useEffect,
   useReactFlow,
+  useRef,
   useState,
   WorkspaceManager,
 } from '../.deps.ts';
@@ -33,9 +35,56 @@ function FlowPanelInner({
   onShowSimulatorLibrary: _,
 }: FlowPanelProps): JSX.Element {
   const [showMap, setShowMap] = useState(false);
-  const { screenToFlowPosition } = useReactFlow();
-
+  const { screenToFlowPosition, fitView } = useReactFlow();
+  const { currentScope, currentScopeData } = workspaceMgr.UseScopeSwitcher();
+  const scopeKey = currentScopeData.Lookup
+    ? `${currentScope}:${currentScopeData.Lookup}`
+    : currentScope;
+  const lastScopeRef = useRef<string | null>(null);
+  const pendingFitRef = useRef(false);
+  const lastNodesSignatureRef = useRef<string | null>(null);
   const { nodes, edges } = workspaceMgr.UseGraphView();
+
+  useEffect(() => {
+    const previousScope = lastScopeRef.current;
+    const scopeChanged = previousScope && previousScope !== scopeKey;
+    lastScopeRef.current = scopeKey;
+
+    if (scopeChanged) {
+      const runFit = () => {
+        fitView({ padding: 0.2 });
+        pendingFitRef.current = false;
+        lastNodesSignatureRef.current = nodes.map((n) => n.id).join('|');
+      };
+
+      if (nodes.length > 0) {
+        const timeout = setTimeout(runFit, 50);
+        return () => clearTimeout(timeout);
+      } else {
+        pendingFitRef.current = true;
+        lastNodesSignatureRef.current = null;
+      }
+    }
+  }, [scopeKey, nodes, fitView]);
+
+  useEffect(() => {
+    if (!pendingFitRef.current) return;
+
+    const signature = nodes.map((n) => n.id).join('|');
+
+    if (signature === lastNodesSignatureRef.current) return;
+    lastNodesSignatureRef.current = signature;
+
+    if (nodes.length === 0) return;
+
+    const runFit = () => {
+      fitView({ padding: 0.2 });
+      pendingFitRef.current = false;
+    };
+
+    const timeout = setTimeout(runFit, 50);
+    return () => clearTimeout(timeout);
+  }, [nodes, edges, fitView]);
   const {
     handleDrop,
     handleConnect,
