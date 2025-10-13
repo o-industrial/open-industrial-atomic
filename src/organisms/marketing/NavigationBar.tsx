@@ -24,12 +24,28 @@ export type MarketingNavigationProps = {
   megaMenuGroups?: MarketingNavMegaMenuGroup[];
 } & JSX.HTMLAttributes<HTMLElement>;
 
+function normalizePath(path: string): string {
+  if (!path) {
+    return '';
+  }
+
+  if (path === '/') {
+    return '/';
+  }
+
+  return path.replace(/\/+$/, '') || '/';
+}
+
 function isActiveLink(href: string, currentPath?: string): boolean {
   if (!currentPath) {
     return false;
   }
 
-  return currentPath === href || currentPath.startsWith(`${href}/`);
+  const normalizedHref = normalizePath(href);
+  const normalizedCurrent = normalizePath(currentPath);
+
+  return normalizedCurrent === normalizedHref ||
+    normalizedCurrent.startsWith(`${normalizedHref}/`);
 }
 
 function mapIntent(intent?: MarketingNavCTA['intent']): ActionStyleTypes {
@@ -57,13 +73,14 @@ export function MarketingNavigation(props: MarketingNavigationProps): JSX.Elemen
   const [openGroup, setOpenGroup] = useState<string | null>(null);
 
   const groupsByHref = useMemo(() => {
-    if (!megaMenuGroups?.length) {
-      return new Map<string, MarketingNavMegaMenuGroup>();
+    const map = new Map<string, MarketingNavMegaMenuGroup>();
+
+    for (const group of megaMenuGroups ?? []) {
+      const key = normalizePath(group.triggerHref);
+      map.set(key, group);
     }
 
-    return new Map<string, MarketingNavMegaMenuGroup>(
-      megaMenuGroups.map((group) => [group.triggerHref, group]),
-    );
+    return map;
   }, [megaMenuGroups]);
 
   const hoverTimeouts = useRef<Map<string, number>>(new Map());
@@ -80,35 +97,40 @@ export function MarketingNavigation(props: MarketingNavigationProps): JSX.Elemen
   }, []);
 
   const clearHoverTimeout = useCallback((href: string) => {
-    const timeoutId = hoverTimeouts.current.get(href);
+    const key = normalizePath(href);
+    const timeoutId = hoverTimeouts.current.get(key);
     if (timeoutId !== undefined) {
       clearTimeout(timeoutId);
-      hoverTimeouts.current.delete(href);
+      hoverTimeouts.current.delete(key);
     }
   }, []);
 
   const openFlyout = useCallback((href: string) => {
-    clearHoverTimeout(href);
-    setOpenGroup(href);
+    const key = normalizePath(href);
+    clearHoverTimeout(key);
+    setOpenGroup(key);
   }, [clearHoverTimeout]);
 
   const closeFlyout = useCallback((href: string) => {
-    clearHoverTimeout(href);
-    setOpenGroup((current) => current === href ? null : current);
+    const key = normalizePath(href);
+    clearHoverTimeout(key);
+    setOpenGroup((current) => current === key ? null : current);
   }, [clearHoverTimeout]);
 
   const scheduleClose = useCallback((href: string) => {
-    clearHoverTimeout(href);
+    const key = normalizePath(href);
+    clearHoverTimeout(key);
     const timeoutId = setTimeout(() => {
-      setOpenGroup((current) => current === href ? null : current);
-      hoverTimeouts.current.delete(href);
+      setOpenGroup((current) => current === key ? null : current);
+      hoverTimeouts.current.delete(key);
     }, 120);
 
-    hoverTimeouts.current.set(href, timeoutId as unknown as number);
+    hoverTimeouts.current.set(key, timeoutId as unknown as number);
   }, [clearHoverTimeout]);
 
   const focusFirstItem = useCallback((href: string) => {
-    const items = itemRefs.current.get(href);
+    const key = normalizePath(href);
+    const items = itemRefs.current.get(key);
     if (!items?.length) {
       return;
     }
@@ -124,7 +146,7 @@ export function MarketingNavigation(props: MarketingNavigationProps): JSX.Elemen
   }, [groupsByHref]);
 
   const otherLinks = useMemo(
-    () => links.filter((link) => !groupedHrefs.has(link.href)),
+    () => links.filter((link) => !groupedHrefs.has(normalizePath(link.href))),
     [links, groupedHrefs],
   );
 
@@ -164,20 +186,21 @@ export function MarketingNavigation(props: MarketingNavigationProps): JSX.Elemen
     >
       <div class='hidden items-center gap-8 md:flex'>
         {links.map((link, index) => {
-          const group = groupsByHref.get(link.href);
+          const linkKey = normalizePath(link.href);
+          const group = groupsByHref.get(linkKey);
           if (!group) {
             return renderSimpleLink(link);
           }
 
-          const isOpen = openGroup === link.href;
+          const isOpen = openGroup === linkKey;
           const isHighlighted = group.items.some((item) => isActiveLink(item.href, currentPath)) ||
             isActiveLink(link.href, currentPath);
 
           const menuId = `marketing-nav-menu-${index}`;
 
-          const existingRefs = itemRefs.current.get(link.href) ?? [];
+          const existingRefs = itemRefs.current.get(linkKey) ?? [];
           existingRefs.length = group.items.length;
-          itemRefs.current.set(link.href, existingRefs);
+          itemRefs.current.set(linkKey, existingRefs);
 
           const handleButtonKeyDown = (
             event: JSX.TargetedKeyboardEvent<HTMLButtonElement>,
@@ -187,23 +210,23 @@ export function MarketingNavigation(props: MarketingNavigationProps): JSX.Elemen
               case ' ': {
                 event.preventDefault();
                 if (isOpen) {
-                  closeFlyout(link.href);
+                  closeFlyout(linkKey);
                 } else {
-                  openFlyout(link.href);
-                  focusFirstItem(link.href);
+                  openFlyout(linkKey);
+                  focusFirstItem(linkKey);
                 }
                 break;
               }
               case 'ArrowDown': {
                 event.preventDefault();
-                openFlyout(link.href);
-                focusFirstItem(link.href);
+                openFlyout(linkKey);
+                focusFirstItem(linkKey);
                 break;
               }
               case 'Escape': {
                 event.preventDefault();
-                closeFlyout(link.href);
-                buttonRefs.current.get(link.href)?.focus();
+                closeFlyout(linkKey);
+                buttonRefs.current.get(linkKey)?.focus();
                 break;
               }
               default:
@@ -219,27 +242,27 @@ export function MarketingNavigation(props: MarketingNavigationProps): JSX.Elemen
               return;
             }
 
-            const container = containerRefs.current.get(link.href);
-            const menu = menuRefs.current.get(link.href);
+            const container = containerRefs.current.get(linkKey);
+            const menu = menuRefs.current.get(linkKey);
 
             if (container?.contains(next) || menu?.contains(next)) {
               return;
             }
 
-            closeFlyout(link.href);
+            closeFlyout(linkKey);
           };
 
           return (
             <div
               key={link.href}
-              ref={(node) => containerRefs.current.set(link.href, node)}
+              ref={(node) => containerRefs.current.set(linkKey, node)}
               class='relative'
-              onMouseEnter={() => openFlyout(link.href)}
-              onMouseLeave={() => scheduleClose(link.href)}
+              onMouseEnter={() => openFlyout(linkKey)}
+              onMouseLeave={() => scheduleClose(linkKey)}
               onBlurCapture={handleBlurCapture}
             >
               <button
-                ref={(node) => buttonRefs.current.set(link.href, node)}
+                ref={(node) => buttonRefs.current.set(linkKey, node)}
                 type='button'
                 class={classSet([
                   'inline-flex items-center gap-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-neon-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-neutral-950',
@@ -253,19 +276,19 @@ export function MarketingNavigation(props: MarketingNavigationProps): JSX.Elemen
                 onClick={(event) => {
                   event.preventDefault();
                   if (isOpen) {
-                    closeFlyout(link.href);
+                    closeFlyout(linkKey);
                   } else {
-                    openFlyout(link.href);
-                    focusFirstItem(link.href);
+                    openFlyout(linkKey);
+                    focusFirstItem(linkKey);
                   }
                 }}
                 onKeyDown={handleButtonKeyDown}
-                onFocus={() => openFlyout(link.href)}
+                onFocus={() => openFlyout(linkKey)}
               >
                 {link.label}
                 <svg
                   class={classSet([
-                    'h-3 w-3 transition-transform duration-150',
+                    'h-2.5 w-2.5 transition-transform duration-150',
                     isOpen ? 'rotate-180' : 'rotate-0',
                   ])}
                   viewBox='0 0 10 6'
@@ -276,7 +299,7 @@ export function MarketingNavigation(props: MarketingNavigationProps): JSX.Elemen
                     d='M1 1l4 4 4-4'
                     fill='none'
                     stroke='currentColor'
-                    stroke-width='1.5'
+                    stroke-width='1.25'
                     stroke-linecap='round'
                     stroke-linejoin='round'
                   />
@@ -284,7 +307,7 @@ export function MarketingNavigation(props: MarketingNavigationProps): JSX.Elemen
               </button>
 
               <div
-                ref={(node) => menuRefs.current.set(link.href, node)}
+                ref={(node) => menuRefs.current.set(linkKey, node)}
                 id={menuId}
                 role='menu'
                 aria-label={group.title}
@@ -294,8 +317,8 @@ export function MarketingNavigation(props: MarketingNavigationProps): JSX.Elemen
                     ? 'pointer-events-auto translate-y-0 opacity-100'
                     : 'pointer-events-none -translate-y-2 opacity-0',
                 ])}
-                onMouseEnter={() => openFlyout(link.href)}
-                onMouseLeave={() => scheduleClose(link.href)}
+                onMouseEnter={() => openFlyout(linkKey)}
+                onMouseLeave={() => scheduleClose(linkKey)}
                 onBlurCapture={handleBlurCapture}
               >
                 <div class='flex flex-col gap-1'>
@@ -306,9 +329,9 @@ export function MarketingNavigation(props: MarketingNavigationProps): JSX.Elemen
                       <a
                         key={item.href}
                         ref={(anchor) => {
-                          const refs = itemRefs.current.get(link.href) ?? [];
+                          const refs = itemRefs.current.get(linkKey) ?? [];
                           refs[itemIndex] = anchor;
-                          itemRefs.current.set(link.href, refs);
+                          itemRefs.current.set(linkKey, refs);
                         }}
                         href={item.href}
                         class={classSet([
@@ -317,12 +340,12 @@ export function MarketingNavigation(props: MarketingNavigationProps): JSX.Elemen
                             ? 'bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white'
                             : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-white',
                         ])}
-                        onClick={() => closeFlyout(link.href)}
+                        onClick={() => closeFlyout(linkKey)}
                         onKeyDown={(event) => {
                           if (event.key === 'Escape') {
                             event.preventDefault();
-                            closeFlyout(link.href);
-                            buttonRefs.current.get(link.href)?.focus();
+                            closeFlyout(linkKey);
+                            buttonRefs.current.get(linkKey)?.focus();
                           }
                         }}
                         onBlur={handleBlurCapture}
