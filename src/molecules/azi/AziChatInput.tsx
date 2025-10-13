@@ -1,5 +1,5 @@
 import { IntentTypes, JSX, useEffect, useRef, useState } from '../../.deps.ts';
-import { Action, ActionStyleTypes, Input, RedoIcon, SendIcon } from '../../.exports.ts';
+import { Action, ActionStyleTypes, Input, Modal, RedoIcon, SendIcon } from '../../.exports.ts';
 
 export type AziChatInputProps = {
   placeholder?: string;
@@ -29,6 +29,7 @@ export function AziChatInput({
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const minHeightRef = useRef<number | null>(null);
 
@@ -85,55 +86,99 @@ export function AziChatInput({
 
   const isDisabled = disabled || sending || resetting;
 
+  const handleOpenResetConfirm = () => {
+    if (isDisabled) return;
+    setShowResetConfirm(true);
+  };
+
+  const handleCloseResetConfirm = () => {
+    if (resetting) return;
+    setShowResetConfirm(false);
+  };
+
+  const handleConfirmReset = async () => {
+    if (!onReset) return;
+    setResetting(true);
+    try {
+      await Promise.resolve(onReset());
+      setInput('');
+      setShowResetConfirm(false);
+    } finally {
+      setResetting(false);
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} class='flex gap-2 w-full'>
-      <Input
-        ref={textareaRef}
-        multiline
-        rows={1}
-        value={input}
-        onInput={handleInput}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-        disabled={isDisabled}
-        intentType={inputIntentType}
-        class='flex-grow resize-none overflow-hidden'
-      />
-
-      <div class='flex items-stretch gap-1'>
-        <Action
-          type='submit'
-          styleType={ActionStyleTypes.Solid | ActionStyleTypes.Thin}
-          intentType={actionIntentType}
+    <>
+      <form onSubmit={handleSubmit} class='flex gap-2 w-full'>
+        <Input
+          ref={textareaRef}
+          multiline
+          rows={1}
+          value={input}
+          onInput={handleInput}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
           disabled={isDisabled}
-          class='text-xs px-3'
-          title='Send'
-        >
-          {sendIcon}
-        </Action>
+          intentType={inputIntentType}
+          class='flex-grow resize-none overflow-hidden'
+        />
 
-        {onReset && (
+        <div class='flex items-stretch gap-1'>
           <Action
-            type='button'
-            onClick={async () => {
-              if (isDisabled) return;
-              setResetting(true);
-              try {
-                await Promise.resolve(onReset?.());
-              } finally {
-                setResetting(false);
-              }
-            }}
+            type='submit'
             styleType={ActionStyleTypes.Solid | ActionStyleTypes.Thin}
-            intentType={IntentTypes.Primary}
+            intentType={actionIntentType}
             disabled={isDisabled}
             class='text-xs px-3'
-            title='Reset Chat'
+            title='Send'
           >
-            {redoIcon}
+            {sendIcon}
           </Action>
-        )}
-      </div>
-    </form>
+
+          {onReset && (
+            <Action
+              type='button'
+              onClick={handleOpenResetConfirm}
+              styleType={ActionStyleTypes.Solid | ActionStyleTypes.Thin}
+              intentType={IntentTypes.Primary}
+              disabled={isDisabled}
+              class='text-xs px-3'
+              title='Reset Chat'
+            >
+              {redoIcon}
+            </Action>
+          )}
+        </div>
+      </form>
+
+      {showResetConfirm && (
+        <Modal title='Reset Azi Chat' onClose={handleCloseResetConfirm}>
+          <div class='space-y-6'>
+            <p class='text-sm text-slate-200'>Are you sure you want to reset this Azi chat?</p>
+            <div class='flex justify-end gap-3'>
+              <Action
+                type='button'
+                onClick={handleCloseResetConfirm}
+                intentType={IntentTypes.Secondary}
+                styleType={ActionStyleTypes.Solid | ActionStyleTypes.Thin}
+                disabled={resetting}
+              >
+                Cancel
+              </Action>
+              <Action
+                type='button'
+                onClick={handleConfirmReset}
+                intentType={IntentTypes.Primary}
+                styleType={ActionStyleTypes.Solid | ActionStyleTypes.Thin}
+                disabled={resetting}
+              >
+                Reset Chat
+              </Action>
+            </div>
+          </div>
+        </Modal>
+      )}
+    </>
   );
 }
