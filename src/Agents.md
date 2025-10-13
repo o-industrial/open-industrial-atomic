@@ -27,15 +27,17 @@ Central catalog of design-system building blocks shared across Open Industrial r
 
 ## Patterns
 
-- Follow atomic design layering: atoms stay presentation-only; stateful logic belongs in organisms/templates.
+- Follow atomic design layering: atoms stay presentation-only; molecules compose atoms with light state only when required; organisms own service calls and orchestration.
+- Keep atoms free of `fetch`, global listeners, or opaque state; promote those concerns to molecules/organisms during upcoming compliance refactors.
 - Prefer composable props over hard-coded styling; rely on tailwind tokens and `neonColors` utilities in `utils/`.
 - Expose new exports through `.exports.ts` and update documentation links immediately.
 - Keep components Preact-friendly; avoid React-only APIs and DOM assumptions that break SSR.
 
 ## Review & Test Checklist
 
-- New components include usage examples or stories where applicable.
-- All affected `deno task test` suites pass locally (add targeted tests when introducing logic).
+- New or changed components include usage examples or stories where applicable.
+- Add or update component/unit tests as we expand coverage for atoms, molecules, and modal UX (`deno task test` must run green).
+- All affected `deno task test` suites pass locally; run targeted filters (`--filter atoms`, `--filter molecules`, etc.) during iteration.
 - Downstream runtime smoke tests run if exports change (at minimum, build the web runtime).
 - Breaking changes are version-gated or documented with migration notes.
 
@@ -44,6 +46,7 @@ Central catalog of design-system building blocks shared across Open Industrial r
 - Do not introduce runtime-specific dependencies (Azure SDK, licensing clients) into atomic layers.
 - Keep bundle footprint lean; confirm tree-shaking works when adding new third-party utilities.
 - Respect licensing headers and avoid copying proprietary assets into this library.
+- Flag layering exceptions (stateful atoms, service-bound molecules) in PR descriptions until the compliance backlog is complete.
 
 ## Ownership Signals
 
@@ -62,8 +65,10 @@ Central catalog of design-system building blocks shared across Open Industrial r
 - Parent guide: [open-industrial-reference-architecture/Agents.md](../Agents.md).
 - Sibling detail guides: [atoms](atoms/Agents.md), [molecules](molecules/Agents.md), [organisms](organisms/Agents.md), [templates](templates/Agents.md), [utils](utils/Agents.md).
 - Cross-runtime usage: [open-industrial-web-runtime/AGENTS.md](../../open-industrial-web-runtime/AGENTS.md).
+- Compliance roadmap: [Atomic plan](../Atomic.plan.md).
 
 ## Changelog Expectations
 
 - Revisit this guide every minor release or when adding a new atomic layer.
 - Log notable structural changes in the repo root changelog or PR notes to keep consumers informed.
+- Update this guide as milestones from the compliance plan complete (layer discipline, accessibility, test automation).

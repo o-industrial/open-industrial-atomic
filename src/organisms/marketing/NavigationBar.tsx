@@ -1,4 +1,4 @@
-import { classSet, JSX, useState } from '../../.deps.ts';
+import { classSet, JSX, useCallback, useEffect, useMemo, useRef, useState } from '../../.deps.ts';
 import { Action, ActionStyleTypes } from '../../atoms/Action.tsx';
 
 export type MarketingNavLink = {
@@ -11,10 +11,17 @@ export type MarketingNavCTA = MarketingNavLink & {
   intent?: 'primary' | 'secondary' | 'ghost';
 };
 
+export type MarketingNavMegaMenuGroup = {
+  triggerHref: string;
+  title: string;
+  items: MarketingNavLink[];
+};
+
 export type MarketingNavigationProps = {
   links: MarketingNavLink[];
   ctas?: MarketingNavCTA[];
   currentPath?: string;
+  megaMenuGroups?: MarketingNavMegaMenuGroup[];
 } & JSX.HTMLAttributes<HTMLElement>;
 
 function isActiveLink(href: string, currentPath?: string): boolean {
@@ -37,47 +44,301 @@ function mapIntent(intent?: MarketingNavCTA['intent']): ActionStyleTypes {
   }
 }
 
-export function MarketingNavigation({
-  links,
-  ctas = [],
-  currentPath,
-  class: _className,
-  ...rest
-}: MarketingNavigationProps): JSX.Element {
+export function MarketingNavigation(props: MarketingNavigationProps): JSX.Element {
+  const {
+    links,
+    ctas = [],
+    currentPath,
+    megaMenuGroups,
+    ...rest
+  } = props;
+
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
+
+  const groupsByHref = useMemo(() => {
+    if (!megaMenuGroups?.length) {
+      return new Map<string, MarketingNavMegaMenuGroup>();
+    }
+
+    return new Map<string, MarketingNavMegaMenuGroup>(
+      megaMenuGroups.map((group) => [group.triggerHref, group]),
+    );
+  }, [megaMenuGroups]);
+
+  const hoverTimeouts = useRef<Map<string, number>>(new Map());
+  const containerRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
+  const menuRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
+  const buttonRefs = useRef<Map<string, HTMLButtonElement | null>>(new Map());
+  const itemRefs = useRef<Map<string, Array<HTMLAnchorElement | null>>>(new Map());
+
+  useEffect(() => {
+    return () => {
+      hoverTimeouts.current.forEach((timeoutId) => clearTimeout(timeoutId));
+      hoverTimeouts.current.clear();
+    };
+  }, []);
+
+  const clearHoverTimeout = useCallback((href: string) => {
+    const timeoutId = hoverTimeouts.current.get(href);
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId);
+      hoverTimeouts.current.delete(href);
+    }
+  }, []);
+
+  const openFlyout = useCallback((href: string) => {
+    clearHoverTimeout(href);
+    setOpenGroup(href);
+  }, [clearHoverTimeout]);
+
+  const closeFlyout = useCallback((href: string) => {
+    clearHoverTimeout(href);
+    setOpenGroup((current) => current === href ? null : current);
+  }, [clearHoverTimeout]);
+
+  const scheduleClose = useCallback((href: string) => {
+    clearHoverTimeout(href);
+    const timeoutId = setTimeout(() => {
+      setOpenGroup((current) => current === href ? null : current);
+      hoverTimeouts.current.delete(href);
+    }, 120);
+
+    hoverTimeouts.current.set(href, timeoutId as unknown as number);
+  }, [clearHoverTimeout]);
+
+  const focusFirstItem = useCallback((href: string) => {
+    const items = itemRefs.current.get(href);
+    if (!items?.length) {
+      return;
+    }
+
+    const focusable = items.find((item) => item);
+    focusable?.focus();
+  }, []);
+
+  const groupedHrefs = useMemo(() => {
+    const set = new Set<string>();
+    groupsByHref.forEach((_value, key) => set.add(key));
+    return set;
+  }, [groupsByHref]);
+
+  const otherLinks = useMemo(
+    () => links.filter((link) => !groupedHrefs.has(link.href)),
+    [links, groupedHrefs],
+  );
+
+  const mobileGroups = useMemo(
+    () => (megaMenuGroups ?? []).filter((group) => group.items.length > 0),
+    [megaMenuGroups],
+  );
 
   const toggleMobile = () => setMobileOpen((open) => !open);
   const closeMobile = () => setMobileOpen(false);
+
+  const renderSimpleLink = (link: MarketingNavLink) => {
+    const active = isActiveLink(link.href, currentPath);
+
+    return (
+      <a
+        key={link.href}
+        href={link.href}
+        target={link.external ? '_blank' : undefined}
+        rel={link.external ? 'noopener noreferrer' : undefined}
+        class={classSet([
+          'text-sm font-medium transition-colors',
+          active
+            ? 'text-neutral-900 dark:text-white'
+            : 'text-neutral-700 hover:text-neutral-900 dark:text-neutral-200 dark:hover:text-white',
+        ])}
+      >
+        {link.label}
+      </a>
+    );
+  };
 
   return (
     <nav
       {...rest}
       class={classSet(['relative flex items-center gap-4'], rest)}
     >
-      <div class='hidden md:flex items-center gap-8'>
-        {links.map((link) => {
-          const active = isActiveLink(link.href, currentPath);
+      <div class='hidden items-center gap-8 md:flex'>
+        {links.map((link, index) => {
+          const group = groupsByHref.get(link.href);
+          if (!group) {
+            return renderSimpleLink(link);
+          }
+
+          const isOpen = openGroup === link.href;
+          const isHighlighted = group.items.some((item) => isActiveLink(item.href, currentPath)) ||
+            isActiveLink(link.href, currentPath);
+
+          const menuId = `marketing-nav-menu-${index}`;
+
+          const existingRefs = itemRefs.current.get(link.href) ?? [];
+          existingRefs.length = group.items.length;
+          itemRefs.current.set(link.href, existingRefs);
+
+          const handleButtonKeyDown = (
+            event: JSX.TargetedKeyboardEvent<HTMLButtonElement>,
+          ) => {
+            switch (event.key) {
+              case 'Enter':
+              case ' ': {
+                event.preventDefault();
+                if (isOpen) {
+                  closeFlyout(link.href);
+                } else {
+                  openFlyout(link.href);
+                  focusFirstItem(link.href);
+                }
+                break;
+              }
+              case 'ArrowDown': {
+                event.preventDefault();
+                openFlyout(link.href);
+                focusFirstItem(link.href);
+                break;
+              }
+              case 'Escape': {
+                event.preventDefault();
+                closeFlyout(link.href);
+                buttonRefs.current.get(link.href)?.focus();
+                break;
+              }
+              default:
+                break;
+            }
+          };
+
+          const handleBlurCapture = (
+            event: JSX.TargetedFocusEvent<HTMLElement>,
+          ) => {
+            const next = event.relatedTarget as HTMLElement | null;
+            if (!next) {
+              return;
+            }
+
+            const container = containerRefs.current.get(link.href);
+            const menu = menuRefs.current.get(link.href);
+
+            if (container?.contains(next) || menu?.contains(next)) {
+              return;
+            }
+
+            closeFlyout(link.href);
+          };
 
           return (
-            <a
+            <div
               key={link.href}
-              href={link.href}
-              target={link.external ? '_blank' : undefined}
-              rel={link.external ? 'noopener noreferrer' : undefined}
-              class={classSet([
-                'text-sm font-medium transition-colors',
-                active
-                  ? 'text-neutral-900 dark:text-white'
-                  : 'text-neutral-700 hover:text-neutral-900 dark:text-neutral-200 dark:hover:text-white',
-              ])}
+              ref={(node) => containerRefs.current.set(link.href, node)}
+              class='relative'
+              onMouseEnter={() => openFlyout(link.href)}
+              onMouseLeave={() => scheduleClose(link.href)}
+              onBlurCapture={handleBlurCapture}
             >
-              {link.label}
-            </a>
+              <button
+                ref={(node) => buttonRefs.current.set(link.href, node)}
+                type='button'
+                class={classSet([
+                  'inline-flex items-center gap-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-neon-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-neutral-950',
+                  isHighlighted
+                    ? 'text-neutral-900 dark:text-white'
+                    : 'text-neutral-700 hover:text-neutral-900 dark:text-neutral-200 dark:hover:text-white',
+                ])}
+                aria-haspopup='menu'
+                aria-expanded={isOpen}
+                aria-controls={menuId}
+                onClick={(event) => {
+                  event.preventDefault();
+                  if (isOpen) {
+                    closeFlyout(link.href);
+                  } else {
+                    openFlyout(link.href);
+                    focusFirstItem(link.href);
+                  }
+                }}
+                onKeyDown={handleButtonKeyDown}
+                onFocus={() => openFlyout(link.href)}
+              >
+                {link.label}
+                <svg
+                  class={classSet([
+                    'h-3 w-3 transition-transform duration-150',
+                    isOpen ? 'rotate-180' : 'rotate-0',
+                  ])}
+                  viewBox='0 0 10 6'
+                  aria-hidden='true'
+                  focusable='false'
+                >
+                  <path
+                    d='M1 1l4 4 4-4'
+                    fill='none'
+                    stroke='currentColor'
+                    stroke-width='1.5'
+                    stroke-linecap='round'
+                    stroke-linejoin='round'
+                  />
+                </svg>
+              </button>
+
+              <div
+                ref={(node) => menuRefs.current.set(link.href, node)}
+                id={menuId}
+                role='menu'
+                aria-label={group.title}
+                class={classSet([
+                  'absolute left-0 top-full z-40 mt-4 w-80 rounded-3xl border border-neutral-200/70 bg-white/95 p-4 shadow-[0_30px_120px_-60px_rgba(15,23,42,0.35)] backdrop-blur-lg transition-all duration-150 dark:border-white/10 dark:bg-neutral-900/95 dark:shadow-[0_40px_160px_-80px_rgba(129,140,248,0.45)]',
+                  isOpen
+                    ? 'pointer-events-auto translate-y-0 opacity-100'
+                    : 'pointer-events-none -translate-y-2 opacity-0',
+                ])}
+                onMouseEnter={() => openFlyout(link.href)}
+                onMouseLeave={() => scheduleClose(link.href)}
+                onBlurCapture={handleBlurCapture}
+              >
+                <div class='flex flex-col gap-1'>
+                  {group.items.map((item, itemIndex) => {
+                    const active = isActiveLink(item.href, currentPath);
+
+                    return (
+                      <a
+                        key={item.href}
+                        ref={(anchor) => {
+                          const refs = itemRefs.current.get(link.href) ?? [];
+                          refs[itemIndex] = anchor;
+                          itemRefs.current.set(link.href, refs);
+                        }}
+                        href={item.href}
+                        class={classSet([
+                          'flex flex-col gap-0.5 rounded-2xl border border-transparent px-4 py-3 text-left transition-colors',
+                          active
+                            ? 'bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white'
+                            : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-white',
+                        ])}
+                        onClick={() => closeFlyout(link.href)}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Escape') {
+                            event.preventDefault();
+                            closeFlyout(link.href);
+                            buttonRefs.current.get(link.href)?.focus();
+                          }
+                        }}
+                        onBlur={handleBlurCapture}
+                      >
+                        <span class='text-sm font-medium'>{item.label}</span>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           );
         })}
       </div>
 
-      <div class='hidden md:flex items-center gap-3'>
+      <div class='hidden items-center gap-3 md:flex'>
         {ctas.map((cta) => (
           <Action
             key={cta.href}
@@ -95,7 +356,7 @@ export function MarketingNavigation({
         <button
           type='button'
           onClick={toggleMobile}
-          class='flex items-center gap-2 rounded-full border border-neutral-300/60 px-3 py-2 text-sm font-medium text-neutral-700 transition-colors dark:border-white/10 dark:text-neutral-200'
+          class='flex items-center gap-2 rounded-full border border-neutral-300/60 px-3 py-2 text-sm font-medium text-neutral-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-neon-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-white/10 dark:text-neutral-200 dark:focus-visible:ring-offset-neutral-950'
           aria-expanded={mobileOpen ? 'true' : 'false'}
           aria-label='Toggle navigation menu'
         >
@@ -110,25 +371,72 @@ export function MarketingNavigation({
 
       {mobileOpen
         ? (
-          <div class='absolute right-0 top-full mt-3 w-64 rounded-2xl border border-neutral-200/80 bg-white/95 p-4 shadow-xl dark:border-white/10 dark:bg-neutral-900/95'>
-            <div class='flex flex-col gap-3'>
-              {links.map((link) => (
-                <a
-                  key={`mobile-${link.href}`}
-                  href={link.href}
-                  onClick={closeMobile}
-                  target={link.external ? '_blank' : undefined}
-                  rel={link.external ? 'noopener noreferrer' : undefined}
-                  class='text-base font-medium text-neutral-700 transition-colors hover:text-neutral-900 dark:text-neutral-200 dark:hover:text-white'
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>
+          <div class='absolute left-0 top-full z-40 mt-3 w-full rounded-3xl border border-neutral-200 bg-white/95 p-5 shadow-[0_35px_160px_-90px_rgba(15,23,42,0.45)] backdrop-blur-lg dark:border-white/10 dark:bg-neutral-900/95 dark:shadow-[0_45px_200px_-110px_rgba(129,140,248,0.55)] md:hidden'>
+            <div class='flex flex-col gap-6'>
+              {mobileGroups.map((group) => (
+                <div key={group.triggerHref} class='flex flex-col gap-2'>
+                  <span class='text-xs font-semibold uppercase tracking-[0.28em] text-neutral-500 dark:text-neutral-400'>
+                    {group.title}
+                  </span>
+                  <div class='flex flex-col gap-1.5'>
+                    {group.items.map((item) => {
+                      const active = isActiveLink(item.href, currentPath);
 
-            {ctas.length
-              ? (
-                <div class='mt-4 border-t border-neutral-200/60 pt-4 dark:border-white/10'>
+                      return (
+                        <a
+                          key={item.href}
+                          href={item.href}
+                          class={classSet([
+                            'rounded-2xl px-3 py-2 text-sm transition-colors',
+                            active
+                              ? 'bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white'
+                              : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-white',
+                          ])}
+                          onClick={closeMobile}
+                        >
+                          {item.label}
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+
+              {otherLinks.length
+                ? (
+                  <div class='flex flex-col gap-2'>
+                    <span class='text-xs font-semibold uppercase tracking-[0.28em] text-neutral-500 dark:text-neutral-400'>
+                      Navigate
+                    </span>
+                    <div class='flex flex-col gap-1.5'>
+                      {otherLinks.map((link) => {
+                        const active = isActiveLink(link.href, currentPath);
+
+                        return (
+                          <a
+                            key={link.href}
+                            href={link.href}
+                            target={link.external ? '_blank' : undefined}
+                            rel={link.external ? 'noopener noreferrer' : undefined}
+                            class={classSet([
+                              'rounded-2xl px-3 py-2 text-sm transition-colors',
+                              active
+                                ? 'bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white'
+                                : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-white',
+                            ])}
+                            onClick={closeMobile}
+                          >
+                            {link.label}
+                          </a>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )
+                : null}
+
+              {ctas.length
+                ? (
                   <div class='flex flex-col gap-2'>
                     {ctas.map((cta) => (
                       <Action
@@ -138,14 +446,15 @@ export function MarketingNavigation({
                         styleType={mapIntent(cta.intent)}
                         target={cta.external ? '_blank' : undefined}
                         rel={cta.external ? 'noopener noreferrer' : undefined}
+                        class='w-full justify-center'
                       >
                         {cta.label}
                       </Action>
                     ))}
                   </div>
-                </div>
-              )
-              : null}
+                )
+                : null}
+            </div>
           </div>
         )
         : null}

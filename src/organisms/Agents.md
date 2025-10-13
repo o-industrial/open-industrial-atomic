@@ -23,13 +23,14 @@ High-level components that orchestrate molecules, manage state, and integrate wi
 ## Patterns
 
 - Favor dependency injection via props for network clients or services; keep organisms testable via mocks.
+- Break large feature controllers into smaller, composable organisms and supporting molecules per the compliance backlog.
 - Use the fluent builders in `src/fluent/*` when composing EaC pipelines.
 - Co-locate schemas or DTOs with the organism, but mirror them in shared types if consumed elsewhere.
 - Surface analytics hooks or telemetry callbacks explicitly to allow runtimes to opt in/out.
 
 ## Review & Test Checklist
 
-- Integration or scenario tests cover critical flows and error handling paths.
+- Integration or scenario tests cover critical flows and error handling paths; expand automated coverage as highlighted in the compliance plan.
 - Verify accessibility: keyboard navigation, focus management, `aria` attributes.
 - Downstream runtimes compile and render the organism in at least one integration test or story.
 
@@ -56,6 +57,7 @@ High-level components that orchestrate molecules, manage state, and integrate wi
 - Parent: [Atomic Library](../Agents.md).
 - Complementary guides: [Molecules](../molecules/Agents.md), [Templates](../templates/Agents.md), [Utils](../utils/Agents.md).
 - Runtime usage: [Web Runtime guide](../../open-industrial-web-runtime/AGENTS.md).
+- Compliance backlog: [Atomic plan](../../Atomic.plan.md).
 
 ## Changelog Expectations
 

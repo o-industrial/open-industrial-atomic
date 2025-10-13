@@ -144,22 +144,27 @@ export function Action(props: ActionProps): JSX.Element {
   const classes = `${baseClasses}${styleClasses} ${intentClasses} ${disabledClasses}`;
 
   if (href && !disabled) {
+    const anchorAttributes = rest as JSX.HTMLAttributes<HTMLAnchorElement>;
+
     return (
       <a
-        {...(rest as JSX.HTMLAttributes<HTMLAnchorElement>)}
+        {...anchorAttributes}
         href={href}
-        class={classSet([classes], rest)}
+        class={classSet([classes], anchorAttributes)}
       >
         {children}
       </a>
     );
   }
 
+  const buttonAttributes = rest as JSX.HTMLAttributes<HTMLButtonElement>;
+
   return (
     <button
-      {...(rest as JSX.HTMLAttributes<HTMLButtonElement>)}
+      {...buttonAttributes}
+      type={buttonAttributes.type ?? 'button'}
       disabled={disabled}
-      class={classSet([classes], rest)}
+      class={classSet([classes], buttonAttributes)}
     >
       {children}
     </button>

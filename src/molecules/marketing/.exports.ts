@@ -4,3 +4,4 @@ export * from './MediaSpotlight.tsx';
 export * from './QuoteCard.tsx';
 export * from './SectionHeader.tsx';
 export * from './ToggleQueryCard.tsx';
+export * from './SectionShell.tsx';

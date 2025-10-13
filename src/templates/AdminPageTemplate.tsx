@@ -16,7 +16,13 @@ export function AdminPageTemplate({
       {header && <header class='w-full'>{header}</header>}
       <div class='flex flex-1 overflow-hidden'>
         {sidebar && <aside class='w-64 flex-shrink-0 overflow-y-auto'>{sidebar}</aside>}
-        <main class='flex-1 overflow-y-auto'>{children}</main>
+        <main
+          class='flex-1 overflow-y-auto'
+          role='main'
+          tabIndex={-1}
+        >
+          {children}
+        </main>
       </div>
     </div>
   );

@@ -4,13 +4,25 @@ export function StreamPanelTemplate({
   children,
   header,
   footer,
+  panelLabel = 'Live stream updates',
+  panelLabelledBy,
+  focusable = true,
 }: {
   children?: ComponentChildren;
   header?: ComponentChildren;
   footer?: ComponentChildren;
+  panelLabel?: string;
+  panelLabelledBy?: string;
+  focusable?: boolean;
 }): JSX.Element {
   return (
-    <aside class='relative w-full h-full flex flex-col bg-neutral-900'>
+    <aside
+      class='relative w-full h-full flex flex-col bg-neutral-900'
+      role='complementary'
+      aria-label={panelLabelledBy ? undefined : panelLabel}
+      aria-labelledby={panelLabelledBy}
+      tabIndex={focusable ? -1 : undefined}
+    >
       {/* Sticky Header */}
       <header class='sticky top-0 z-10 w-full px-4 py-2 bg-neutral-800 border-b border-neutral-700'>
         {header ?? (

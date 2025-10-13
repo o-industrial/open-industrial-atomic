@@ -22,13 +22,14 @@ Composable clusters of atoms that encapsulate small units of behavior (forms, ca
 ## Patterns
 
 - Compose atoms through props; keep styling override hooks minimal and well-documented.
+- Keep service orchestration out of molecules; delegate `fetch`/SDK calls to organisms or higher-level controllers per the compliance plan.
 - Guard optional dependencies (e.g., Azure SDK types) behind lazy imports or dependency injection.
 - Prefer hooks from `atomic/utils` for formatting, colors, and route helpers to avoid drift.
 - When molecules expose callbacks, type them explicitly and document expected side effects.
 
 ## Review & Test Checklist
 
-- Include unit tests for domain logic (e.g., form validators, derived metrics).
+- Include unit tests for domain logic (e.g., form validators, derived metrics) and keep `deno task test --filter molecules` passing.
 - Validate story/demo coverage for new molecules to assist design reviews.
 - Ensure molecules remain tree-shakeable: verify exports are referenced from `.exports.ts` only once.
 
@@ -54,6 +55,7 @@ Composable clusters of atoms that encapsulate small units of behavior (forms, ca
 
 - Parent guide: [Atomic Library](../Agents.md).
 - Related layers: [Atoms](../atoms/Agents.md), [Organisms](../organisms/Agents.md), [Templates](../templates/Agents.md), [Utils](../utils/Agents.md).
+- Compliance backlog: [Atomic plan](../../Atomic.plan.md).
 
 ## Changelog Expectations
 
