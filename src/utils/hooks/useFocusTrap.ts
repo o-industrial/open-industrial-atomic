@@ -1,4 +1,4 @@
-import { IS_BROWSER, useEffect, useRef } from '../../.deps.ts';
+import { IS_BROWSER, MutableRef, useEffect, useRef } from '../../.deps.ts';
 
 const focusableSelector = [
   'a[href]',
@@ -24,7 +24,7 @@ export interface UseFocusTrapOptions {
 export function useFocusTrap<T extends HTMLElement>({
   active = true,
   restoreFocus = true,
-}: UseFocusTrapOptions = {}) {
+}: UseFocusTrapOptions = {}): MutableRef<T | null> {
   const containerRef = useRef<T | null>(null);
 
   useEffect(() => {

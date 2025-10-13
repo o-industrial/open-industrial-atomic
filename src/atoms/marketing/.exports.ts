@@ -5,3 +5,4 @@ export * from './SectionSurface.tsx';
 export * from './StatPill.tsx';
 export * from './TogglePillButton.tsx';
 export * from './PreHeadline.tsx';
+export * from './GlowPill.tsx';
