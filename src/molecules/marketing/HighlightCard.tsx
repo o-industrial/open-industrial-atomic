@@ -54,7 +54,7 @@ export type MarketingHighlightCardProps = {
   titleClass?: string;
   promptClass?: string;
   eyebrowClass?: string;
-} & JSX.HTMLAttributes<HTMLElement>;
+} & Omit<JSX.HTMLAttributes<HTMLElement>, 'icon'>;
 
 export function MarketingHighlightCard({
   title,
