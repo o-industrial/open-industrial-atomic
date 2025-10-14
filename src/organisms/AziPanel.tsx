@@ -107,7 +107,7 @@ export function AziPanel({
   aziMgr,
   extraInputs,
   title,
-  headerRightInset = 15,
+  headerRightInset = 20,
 }: AziPanelProps): JSX.Element {
   const {
     state,
@@ -287,6 +287,7 @@ export function AziPanel({
             styleType={ActionStyleTypes.Icon}
             intentType={IntentTypes.Primary}
             disabled={isSending || isResetting}
+            style='padding-right:0;'
             title='Reset Chat'
           >
             <RedoIcon class='w-5 h-5' />
