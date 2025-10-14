@@ -42,7 +42,7 @@ Layout-level building blocks that frame pages, route shells, and workspace exper
 
 - Do not import runtime-specific routes or state stores; expose integration points via props.
 - Keep heavy dependencies (maps, charts) out of templates; delegate to organisms for opt-in loading.
-- Maintain SSR compatibility�avoid direct `window`/`document` usage during initial render.
+- Maintain SSR compatibility—avoid direct `window`/`document` usage during initial render.
 
 ## Ownership Signals
 
