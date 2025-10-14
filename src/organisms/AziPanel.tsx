@@ -276,7 +276,7 @@ export function AziPanel({
     <>
       <AziPanelTemplate
         onClose={onClose}
-        title={title}
+        panelLabel={title}
         headerActions={
           <Action
             type='button'

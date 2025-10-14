@@ -5,13 +5,15 @@ export function AziPanelTemplate({
   children,
   input,
   onClose,
-  panelLabel = 'Azi understanding',
+  headerActions,
+  panelLabel = `Azi's understanding`,
   panelLabelledBy,
   focusable = true,
 }: {
   children?: ComponentChildren;
   input?: ComponentChildren;
   onClose?: () => void;
+  headerActions?: ComponentChildren;
   panelLabel?: string;
   panelLabelledBy?: string;
   focusable?: boolean;
@@ -27,7 +29,7 @@ export function AziPanelTemplate({
       {/* Sticky Header */}
       <header class='sticky top-0 z-10 w-full px-4 py-2 bg-neutral-800 border-b border-neutral-700 flex items-center'>
         <h2 class='text-sm font-semibold tracking-wide text-white uppercase'>
-          {title}
+          {panelLabel}
         </h2>
 
         <div class='flex items-center ml-auto' style={{ gap: '12px' }}>
