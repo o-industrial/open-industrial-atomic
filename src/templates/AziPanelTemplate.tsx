@@ -9,6 +9,7 @@ export function AziPanelTemplate({
   panelLabel = `Azi's understanding`,
   panelLabelledBy,
   focusable = true,
+  headerRightInset = 0,
 }: {
   children?: ComponentChildren;
   input?: ComponentChildren;
@@ -17,6 +18,7 @@ export function AziPanelTemplate({
   panelLabel?: string;
   panelLabelledBy?: string;
   focusable?: boolean;
+  headerRightInset?: number;
 }): JSX.Element {
   return (
     <aside
@@ -32,7 +34,10 @@ export function AziPanelTemplate({
           {panelLabel}
         </h2>
 
-        <div class='flex items-center ml-auto' style={{ gap: '12px' }}>
+        <div
+          class='flex items-center ml-auto'
+          style={{ gap: '12px', marginRight: `${headerRightInset}px` }}
+        >
           {headerActions}
           {onClose && (
             <Action

@@ -38,6 +38,7 @@ type AziPanelProps = {
   extraInputs?: Record<string, unknown>;
   elementId?: string;
   title?: string;
+  headerRightInset?: number;
 };
 
 function ReasoningBlock({
@@ -106,6 +107,7 @@ export function AziPanel({
   aziMgr,
   extraInputs,
   title,
+  headerRightInset = 15,
 }: AziPanelProps): JSX.Element {
   const {
     state,
@@ -277,6 +279,7 @@ export function AziPanel({
       <AziPanelTemplate
         onClose={onClose}
         panelLabel={title}
+        headerRightInset={headerRightInset}
         headerActions={
           <Action
             type='button'
@@ -285,7 +288,6 @@ export function AziPanel({
             intentType={IntentTypes.Primary}
             disabled={isSending || isResetting}
             title='Reset Chat'
-            style='margin-right:15px;'
           >
             <RedoIcon class='w-5 h-5' />
           </Action>
