@@ -1,5 +1,4 @@
-import { ComponentChildren, IntentTypes, JSX, useMemo } from '../.deps.ts';
-import { Action, ActionStyleTypes, CloseIcon } from '../.exports.ts';
+import { ComponentChildren, JSX, useMemo } from '../.deps.ts';
 
 export type InspectorPanelTemplateProps = {
   children?: ComponentChildren;
@@ -13,7 +12,7 @@ export type InspectorPanelTemplateProps = {
 export function InspectorPanelTemplate({
   children,
   title = 'Inspector',
-  onClose,
+  onClose: _onClose,
   panelLabel = 'Inspector panel',
   panelLabelledBy,
   focusable = true,
@@ -40,21 +39,6 @@ export function InspectorPanelTemplate({
         >
           {title}
         </h2>
-
-        {onClose
-          ? (
-            <Action
-              type='button'
-              aria-label='Close inspector panel'
-              title='Close inspector panel'
-              intentType={IntentTypes.Secondary}
-              styleType={ActionStyleTypes.Icon}
-              onClick={onClose}
-            >
-              <CloseIcon aria-hidden='true' class='h-4 w-4' />
-            </Action>
-          )
-          : null}
       </header>
 
       {/* Scrollable Content */}
