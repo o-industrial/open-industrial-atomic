@@ -24,6 +24,7 @@ Styling-agnostic UI primitives and inputs tailored for Open Industrial. Atoms mu
 ## Patterns
 
 - Favor functional components with clear prop typing (`ComponentProps<"button">`, etc.).
+- Keep atoms stateless: avoid `useState`, `useEffect`, timers, and `fetch`; treat atoms as pure view layers ahead of the compliance refactor backlog.
 - Use Tailwind utility class strings for styling; expose variant enums through props instead of hard-coded class names.
 - Keep accessibility in mind: provide `aria-*` passthrough props, label associations, and keyboard interactions.
 - Document new props in JSDoc atop the component to aid downstream IDE tooling.
@@ -31,7 +32,7 @@ Styling-agnostic UI primitives and inputs tailored for Open Industrial. Atoms mu
 ## Review & Test Checklist
 
 - Story or usage example updated/added when the component is new or behavior changes.
-- Snapshot or rendering test covers visual variants; prefer Playwright visual tests when available.
+- Add DOM/snapshot tests for new primitives as the automated suite expands; ensure `deno task test --filter atoms` stays green.
 - Breaking prop contract changes include migration notes and bump version tags where relevant.
 
 ## Safety & Guardrails
@@ -55,6 +56,7 @@ Styling-agnostic UI primitives and inputs tailored for Open Industrial. Atoms mu
 
 - Parent: [Atomic Library guide](../Agents.md).
 - Sibling layers: [Molecules](../molecules/Agents.md), [Organisms](../organisms/Agents.md), [Templates](../templates/Agents.md), [Utils](../utils/Agents.md).
+- Compliance backlog: see [Atomic plan](../../Atomic.plan.md) for refactor milestones.
 
 ## Changelog Expectations
 

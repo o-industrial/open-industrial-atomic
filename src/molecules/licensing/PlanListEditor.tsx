@@ -1,6 +1,6 @@
 import { IntentTypes, JSX, useState } from '../../.deps.ts';
 import { PriceListEditor, type PriceListEditorProps } from './PriceListEditor.tsx';
-import { StringArrayEditor } from '../../atoms/StringArrayEditor.tsx';
+import { StringArrayEditor } from '../forms/StringArrayEditor.tsx';
 import { Input } from '../../atoms/forms/Input.tsx';
 import { Action, ActionStyleTypes } from '../../atoms/Action.tsx';
 

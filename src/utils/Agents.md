@@ -26,10 +26,11 @@ Shared hooks, helpers, and constants that support the atomic component stack. Ut
 - Document return types and edge cases with JSDoc for IDE support.
 - Avoid overloading utils with multiple responsibilities; split modules when APIs grow.
 - Prefer exporting named functions/constants; avoid default exports to keep tree-shaking effective.
+- Promote widely reused hooks from organisms into `utils/` as part of the compliance decomposition work.
 
 ## Review & Test Checklist
 
-- Unit tests cover boundary conditions and error paths for helpers.
+- Unit tests cover boundary conditions and error paths for helpers; increase coverage as tracked in the compliance backlog.
 - Verify downstream components compile when updating utility signatures.
 - Update changelog notes in consuming layers if behavior shifts (e.g., new color tokens).
 
@@ -55,6 +56,7 @@ Shared hooks, helpers, and constants that support the atomic component stack. Ut
 
 - Parent guide: [Atomic Library](../Agents.md).
 - Layer guides consuming these utilities: [Atoms](../atoms/Agents.md), [Molecules](../molecules/Agents.md), [Organisms](../organisms/Agents.md), [Templates](../templates/Agents.md).
+- Compliance backlog: [Atomic plan](../../Atomic.plan.md).
 
 ## Changelog Expectations
 

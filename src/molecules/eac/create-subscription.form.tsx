@@ -1,26 +1,43 @@
 import { Action } from '../../atoms/Action.tsx';
 import { Input } from '../../atoms/forms/Input.tsx';
 import { Select } from '../../atoms/forms/Select.tsx';
-import { classSet, JSX, useEffect, useMemo, useState } from '../../.deps.ts';
 import { ToggleCheckbox } from '../../atoms/forms/ToggleCheckbox.tsx';
+import { classSet, JSX, useEffect, useMemo, useState } from '../../.deps.ts';
+
+export type EaCBillingScopeMap = Record<string, string>;
 
 export type EaCCreateSubscriptionFormProps = JSX.HTMLAttributes<HTMLFormElement> & {
   entLookup?: string;
   cloudLookup?: string;
+  billingScopes?: EaCBillingScopeMap;
+  scopesLoading?: boolean;
+  scopesError?: string;
+  onRetryScopes?: () => void;
+  initialScope?: string;
+  initialName?: string;
+  initialIsDev?: boolean;
 };
 
 export function EaCCreateSubscriptionForm(
   props: EaCCreateSubscriptionFormProps,
 ): JSX.Element {
-  const { class: className, ...rest } = props as any;
+  const {
+    class: className,
+    billingScopes = {},
+    scopesLoading = false,
+    scopesError,
+    onRetryScopes,
+    entLookup,
+    cloudLookup,
+    initialScope,
+    initialName = '',
+    initialIsDev = true,
+    ...rest
+  } = props as EaCCreateSubscriptionFormProps & { class?: string };
 
-  const [name, setName] = useState('');
-  const [isDev, setIsDev] = useState(true);
-  const [billingScopes, setBillingScopes] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | undefined>();
-
-  const [selectedScope, setSelectedScope] = useState('');
+  const [name, setName] = useState(initialName);
+  const [isDev, setIsDev] = useState(initialIsDev);
+  const [selectedScope, setSelectedScope] = useState(initialScope ?? '');
 
   const sortedScopes = useMemo(() => {
     return Object.entries(billingScopes)
@@ -29,36 +46,32 @@ export function EaCCreateSubscriptionForm(
   }, [billingScopes]);
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        setLoading(true);
-        const res = await fetch('/workspace/api/azure/billing/scopes');
-        const data = await res.json();
-        if (!cancelled) {
-          setBillingScopes((typeof data === 'object' && data !== null) ? data : {});
-        }
-      } catch (err) {
-        if (!cancelled) setError('Failed to load billing scopes');
-        console.error(err);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    setName(initialName);
+  }, [initialName]);
 
   useEffect(() => {
-    const scopeExists = selectedScope && selectedScope in billingScopes;
+    setIsDev(initialIsDev);
+  }, [initialIsDev]);
 
-    if ((!selectedScope || !scopeExists) && sortedScopes.length) {
-      setSelectedScope(sortedScopes[0].id);
-    } else if (!sortedScopes.length && selectedScope) {
-      setSelectedScope('');
+  useEffect(() => {
+    if (initialScope) {
+      setSelectedScope(initialScope);
+      return;
     }
-  }, [billingScopes, sortedScopes, selectedScope]);
+
+    setSelectedScope((current) => {
+      const hasCurrent = current && billingScopes[current] !== undefined;
+      if (hasCurrent) {
+        return current;
+      }
+
+      if (sortedScopes.length) {
+        return sortedScopes[0].id;
+      }
+
+      return '';
+    });
+  }, [billingScopes, sortedScopes, initialScope]);
 
   return (
     <form
@@ -68,10 +81,10 @@ export function EaCCreateSubscriptionForm(
       class={classSet([
         'w-full max-w-sm md:max-w-md mx-auto py-3 mt-2 space-y-4',
         className ?? '',
-      ], props)}
+      ], rest)}
     >
-      <input id='entLookup' name='entLookup' type='hidden' value={props.entLookup} />
-      <input id='cloudLookup' name='cloudLookup' type='hidden' value={props.cloudLookup} />
+      <input id='entLookup' name='entLookup' type='hidden' value={entLookup} />
+      <input id='cloudLookup' name='cloudLookup' type='hidden' value={cloudLookup} />
       <input id='billing-scope' name='billing-scope' type='hidden' value={selectedScope} />
       <input id='is-dev' name='is-dev' type='hidden' value={isDev ? 'true' : 'false'} />
 
@@ -85,8 +98,8 @@ export function EaCCreateSubscriptionForm(
             value={name}
             required
             placeholder='Enter new subscription name'
-            onInput={(e: JSX.TargetedEvent<HTMLInputElement, Event>) =>
-              setName((e.target as HTMLInputElement).value)}
+            onInput={(event: JSX.TargetedEvent<HTMLInputElement, Event>) =>
+              setName((event.target as HTMLInputElement).value)}
           />
         </div>
 
@@ -103,22 +116,41 @@ export function EaCCreateSubscriptionForm(
           <Select
             label='Billing Scope'
             value={selectedScope}
-            disabled={loading || !!error || sortedScopes.length === 0}
-            onChange={(e) => setSelectedScope((e.target as HTMLSelectElement).value)}
+            disabled={scopesLoading || !!scopesError || sortedScopes.length === 0}
+            onChange={(event) => setSelectedScope((event.target as HTMLSelectElement).value)}
           >
             <option value='' disabled>
-              {loading ? 'Loading scopes...' : 'Choose a billing scope'}
+              {scopesLoading ? 'Loading scopes...' : 'Choose a billing scope'}
             </option>
-            {sortedScopes.map((scope, i) => <option value={scope.id} key={i}>{scope.label}
-            </option>)}
+            {sortedScopes.map((scope) => (
+              <option value={scope.id} key={scope.id}>{scope.label}</option>
+            ))}
           </Select>
-          {error && <p class='mt-1 text-xs text-rose-300'>{error}</p>}
-          {!loading && !error && sortedScopes.length === 0 && (
-            <p class='mt-1 text-xs text-slate-300'>
-              No billing scopes found. Verify your Azure account has access to billing profiles or
-              invoice sections.
-            </p>
-          )}
+
+          <div class='mt-1 space-y-1 text-xs'>
+            {scopesError
+              ? (
+                <p class='flex items-center gap-2 text-rose-300'>
+                  <span>{scopesError}</span>
+                  {onRetryScopes && (
+                    <button
+                      type='button'
+                      class='underline decoration-dotted underline-offset-2 text-rose-200 hover:text-rose-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900'
+                      onClick={onRetryScopes}
+                    >
+                      Retry
+                    </button>
+                  )}
+                </p>
+              )
+              : null}
+            {!scopesLoading && !scopesError && sortedScopes.length === 0 && (
+              <p class='text-slate-300'>
+                No billing scopes found. Verify your Azure account has access to billing profiles or
+                invoice sections.
+              </p>
+            )}
+          </div>
         </div>
       </div>
 

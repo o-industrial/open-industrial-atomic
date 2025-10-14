@@ -7,7 +7,7 @@ export {
   type EverythingAsCodeOIWorkspace,
   type MultiProtocolIngestOption,
   type SurfaceDataConnectionSettings,
-} from 'jsr:@o-industrial/common@0.0.493/eac';
+} from 'jsr:@o-industrial/common@0.0.496/eac';
 
 export {
   AziManager,
@@ -22,7 +22,7 @@ export {
   type SimulatorPackDefinition,
   WorkspaceManager,
   type WorkspaceSummary,
-} from 'jsr:@o-industrial/common@0.0.493/flow';
+} from 'jsr:@o-industrial/common@0.0.496/flow';
 
 export {
   type AccountProfile,
@@ -33,12 +33,12 @@ export {
   type RuntimeImpulse,
   type RuntimeImpulseSources,
   type TeamMembership,
-} from 'jsr:@o-industrial/common@0.0.493/types';
+} from 'jsr:@o-industrial/common@0.0.496/types';
 
 export {
   type ResolvedImpulseContext,
   resolveImpulseContext,
-} from 'jsr:@o-industrial/common@0.0.493/utils/client';
+} from 'jsr:@o-industrial/common@0.0.496/utils/client';
 
 export { classSet, IS_BROWSER } from 'jsr:@fathym/atomic@0.0.184';
 
@@ -53,7 +53,14 @@ export {
   type JSX,
   type Ref,
 } from 'npm:preact@10.20.1';
-export { useCallback, useEffect, useMemo, useRef, useState } from 'npm:preact@10.20.1/hooks';
+export {
+  type MutableRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'npm:preact@10.20.1/hooks';
 
 export { createPortal, type ForwardedRef, forwardRef } from 'npm:preact@10.20.1/compat';
 

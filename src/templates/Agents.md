@@ -25,13 +25,18 @@ Layout-level building blocks that frame pages, route shells, and workspace exper
 - Compose organisms via slot props; avoid hard-wiring specific data sources.
 - Provide configuration props for analytics, navigation, and feature flags to keep templates generic.
 - Ensure responsive design using Tailwind breakpoints or CSS grid helpers defined centrally.
-- Embed accessibility primitives (landmarks, skip links) so runtimes get them by default.
+- Embed accessibility primitives (landmarks, skip links) so runtimes get them by default; upcoming compliance work adds default roles/aria hooks.
+- Workspace panels expose `panelLabel`, `panelLabelledBy`, and `focusable` props so downstream screens can wire ARIA landmarks without duplicating focus management.
+- When templates expose dismiss or close controls, wire them through shared `Action` atoms with explicit `aria-label`/`title` props so instrumentation and accessibility stay uniform across runtimes.
+- Honor shared sizing tokens: `SectionSurface` width defaults to `max-w-6xl` (≈72rem) for general content, `wide` expands to `max-w-7xl` (≈80rem) for hero storytelling, and `full` removes caps for immersive canvases. Panel templates (Inspector, Azi flows, timeline shells) should keep a minimum width of 320px, cap near 420px, and expose flexible containers so consuming layouts can manage split views without forking styles.
 
 ## Review & Test Checklist
 
 - Visual regression or screenshot tests capture layout changes.
 - Verify responsive states across key breakpoints (mobile, tablet, desktop).
 - Document props and expected child components in component-level JSDoc.
+- Add accessibility assertions (landmark presence, focus order) as automated tests come online.
+- Confirm template landmarks render (`role="main"`, `role="complementary"`) and that focusable regions accept programmatic focus via `tabIndex={-1}` helpers.
 
 ## Safety & Guardrails
 
@@ -55,6 +60,7 @@ Layout-level building blocks that frame pages, route shells, and workspace exper
 
 - Parent: [Atomic Library](../Agents.md).
 - Sibling layers: [Atoms](../atoms/Agents.md), [Molecules](../molecules/Agents.md), [Organisms](../organisms/Agents.md), [Utils](../utils/Agents.md).
+- Compliance backlog: [Atomic plan](../../Atomic.plan.md).
 
 ## Changelog Expectations
 

@@ -1,4 +1,5 @@
 export * from './marketing/.exports.ts';
+export * from './forms/.exports.ts';
 export * from './azi/.exports.ts';
 export * from './azure/.exports.ts';
 export * from './flows/.exports.ts';
@@ -7,6 +8,7 @@ export * from './licensing/.exports.ts';
 export * from './writing-devices/.exports.ts';
 
 export * from './AdminNav.tsx';
+export * from './AdminCard.tsx';
 export * from './AgreementCard.tsx';
 export * from './AppFrameBar.tsx';
 export * from './AziToolResponseCard.tsx';
