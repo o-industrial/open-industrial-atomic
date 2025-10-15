@@ -1,5 +1,5 @@
 import { Icon, IconProps, JSX } from "./icon.deps.ts"
 
 export function SearchIcon(props: IconProps): JSX.Element {
-  return <Icon {...props} src="/icons/iconset" icon="search" />;
+  return <Icon {...props} src="./icons/iconset" icon="search" />;
 }
