@@ -13,12 +13,14 @@ import {
   useCallback,
   useEffect,
   useRef,
+  useState,
   WorkspaceManager,
 } from '../.deps.ts';
 
 import { AziPanelTemplate } from '../templates/AziPanelTemplate.tsx';
 import { AziChatInput } from '../molecules/azi/AziChatInput.tsx';
 import { AziChatMessage } from '../molecules/azi/AziChatMessage.tsx';
+import { Action, ActionStyleTypes, Modal, RedoIcon } from '../.exports.ts';
 
 export const IsIsland = true;
 
@@ -35,6 +37,8 @@ type AziPanelProps = {
   renderMessage?: (message: string) => string;
   extraInputs?: Record<string, unknown>;
   elementId?: string;
+  title?: string;
+  headerRightInset?: number;
 };
 
 function ReasoningBlock({
@@ -102,6 +106,8 @@ export function AziPanel({
   renderMessage,
   aziMgr,
   extraInputs,
+  title,
+  headerRightInset = 20,
 }: AziPanelProps): JSX.Element {
   const {
     state,
@@ -111,6 +117,9 @@ export function AziPanel({
     scrollRef,
     registerStreamAnchor,
   } = workspaceMgr.UseAzi(aziMgr);
+
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   // Track when the initial peek has completed
   const hasPeekedRef = useRef(false);
@@ -226,8 +235,18 @@ export function AziPanel({
       />
     );
   });
+  const openResetConfirm = () => setShowResetConfirm(true);
+  const closeResetConfirm = () => {
+    if (isResetting) return;
+    setShowResetConfirm(false);
+  };
+  const confirmReset = async () => {
+    setShowResetConfirm(false);
+    await handleReset();
+  };
 
   const handleReset = useCallback(async () => {
+    setIsResetting(true);
     try {
       const threadId = aziMgr.GetThreadId?.() ?? '';
       const aziType = threadId.includes('warmquery') ? 'azi-warm-query' : 'azi';
@@ -246,38 +265,82 @@ export function AziPanel({
         console.error('[AziPanel] Reset failed', res.status, await res.text().catch(() => ''));
       }
 
-      // Allow auto-greet to fire again after reset
       autoGreetSentRef.current = false;
-
-      // Reload conversation state
       await peek();
     } catch (err) {
       console.error('[AziPanel] Reset error', err);
+    } finally {
+      setIsResetting(false);
     }
   }, [aziMgr, peek, workspaceMgr]);
 
   return (
-    <AziPanelTemplate
-      onClose={onClose}
-      input={
-        <AziChatInput
-          onSend={wrappedSend}
-          extraInputs={extraInputs}
-          disabled={isSending}
-          onReset={handleReset}
-        />
-      }
-    >
-      <div ref={scrollRef} class='overflow-y-auto h-full'>
-        {renderedMessages}
+    <>
+      <AziPanelTemplate
+        onClose={onClose}
+        panelLabel={title}
+        headerRightInset={headerRightInset}
+        headerActions={
+          <Action
+            type='button'
+            onClick={openResetConfirm}
+            styleType={ActionStyleTypes.Icon}
+            intentType={IntentTypes.Primary}
+            disabled={isSending || isResetting}
+            style='padding-right:0;'
+            title='Reset Chat'
+          >
+            <RedoIcon class='w-5 h-5' />
+          </Action>
+        }
+        input={
+          <AziChatInput
+            onSend={wrappedSend}
+            extraInputs={extraInputs}
+            disabled={isSending || isResetting}
+            onReset={handleReset}
+            showResetAction={false}
+          />
+        }
+      >
+        <div ref={scrollRef} class='overflow-y-auto h-full'>
+          {renderedMessages}
 
-        <div
-          ref={(el) => {
-            registerStreamAnchor(el);
-          }}
-          class='h-4'
-        />
-      </div>
-    </AziPanelTemplate>
+          <div
+            ref={(el) => {
+              registerStreamAnchor(el);
+            }}
+            class='h-4'
+          />
+        </div>
+      </AziPanelTemplate>
+      {showResetConfirm && (
+        <Modal title='Reset Azi Chat' onClose={closeResetConfirm}>
+          <div class='space-y-6'>
+            <p class='text-sm text-slate-200'>Are you sure you want to reset this Azi chat?</p>
+            <div class='flex justify-end gap-3'>
+              <Action
+                type='button'
+                onClick={closeResetConfirm}
+                intentType={IntentTypes.Secondary}
+                styleType={ActionStyleTypes.Solid | ActionStyleTypes.Thin}
+                disabled={isResetting}
+              >
+                Cancel
+              </Action>
+              <Action
+                type='button'
+                onClick={confirmReset}
+                intentType={IntentTypes.Primary}
+                styleType={ActionStyleTypes.Solid | ActionStyleTypes.Thin}
+                disabled={isResetting}
+              >
+                Reset Chat
+              </Action>
+            </div>
+          </div>
+        </Modal>
+      )}
+    </>
   );
 }
