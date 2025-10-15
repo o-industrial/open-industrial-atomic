@@ -5,16 +5,20 @@ export function AziPanelTemplate({
   children,
   input,
   onClose,
-  panelLabel = 'Azi understanding',
+  headerActions,
+  panelLabel = `Azi's understanding`,
   panelLabelledBy,
   focusable = true,
+  headerRightInset = 0,
 }: {
   children?: ComponentChildren;
   input?: ComponentChildren;
   onClose?: () => void;
+  headerActions?: ComponentChildren;
   panelLabel?: string;
   panelLabelledBy?: string;
   focusable?: boolean;
+  headerRightInset?: number;
 }): JSX.Element {
   return (
     <aside
@@ -25,20 +29,26 @@ export function AziPanelTemplate({
       tabIndex={focusable ? -1 : undefined}
     >
       {/* Sticky Header */}
-      <header class='sticky top-0 z-10 w-full px-4 py-2 bg-neutral-800 border-b border-neutral-700 flex items-center justify-between'>
+      <header class='sticky top-0 z-10 w-full px-4 py-2 bg-neutral-800 border-b border-neutral-700 flex items-center'>
         <h2 class='text-sm font-semibold tracking-wide text-white uppercase'>
-          Azi’s Understanding
+          {panelLabel}
         </h2>
 
-        {onClose && (
-          <Action
-            onClick={onClose}
-            styleType={ActionStyleTypes.Icon}
-            title='Close Panel'
-          >
-            ✕
-          </Action>
-        )}
+        <div
+          class='flex items-center ml-auto'
+          style={{ gap: '12px', marginRight: `${headerRightInset}px` }}
+        >
+          {headerActions}
+          {onClose && (
+            <Action
+              onClick={onClose}
+              styleType={ActionStyleTypes.Icon}
+              title='Close Panel'
+            >
+              &times;
+            </Action>
+          )}
+        </div>
       </header>
 
       {/* Scrollable Message History */}
