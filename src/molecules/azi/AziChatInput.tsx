@@ -12,6 +12,7 @@ export type AziChatInputProps = {
   maxHeight?: number; // in pixels
   extraInputs?: Record<string, unknown>;
   onReset?: () => void | Promise<void>;
+  showResetAction?: boolean;
 };
 
 export function AziChatInput({
@@ -22,9 +23,10 @@ export function AziChatInput({
   actionIntentType = IntentTypes.Primary,
   sendIcon = <SendIcon class='w-5 h-5' />,
   redoIcon = <RedoIcon class='w-5 h-5' />,
-  maxHeight = 50,
+  maxHeight = 80,
   extraInputs = {},
   onReset,
+  showResetAction = true,
 }: AziChatInputProps): JSX.Element {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
@@ -37,14 +39,11 @@ export function AziChatInput({
     const el = textareaRef.current;
     if (!el) return;
 
-    el.style.height = 'auto';
+    el.style.height = `${maxHeight}px`;
 
-    const measured = el.scrollHeight;
     if (minHeightRef.current == null) {
-      minHeightRef.current = measured;
+      minHeightRef.current = maxHeight;
     }
-    const target = Math.min(Math.max(measured, minHeightRef.current), maxHeight);
-    el.style.height = `${target}px`;
     el.style.overflowY = el.scrollHeight > maxHeight ? 'scroll' : 'hidden';
   };
 
@@ -87,7 +86,7 @@ export function AziChatInput({
   const isDisabled = disabled || sending || resetting;
 
   const handleOpenResetConfirm = () => {
-    if (isDisabled) return;
+    if (!showResetAction || isDisabled) return;
     setShowResetConfirm(true);
   };
 
@@ -110,40 +109,41 @@ export function AziChatInput({
 
   return (
     <>
-      <form onSubmit={handleSubmit} class='flex gap-2 w-full'>
+      <form onSubmit={handleSubmit} class='flex gap-2 w-full items-stretch'>
         <Input
           ref={textareaRef}
           multiline
-          rows={1}
+          rows={5}
           value={input}
           onInput={handleInput}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={isDisabled}
           intentType={inputIntentType}
-          class='flex-grow resize-none overflow-hidden'
+          class='flex-grow resize-none overflow-hidden h-full'
+          style={{ minHeight: `${maxHeight}px`, maxHeight: `${maxHeight}px` }}
         />
 
-        <div class='flex items-stretch gap-1'>
+        <div class='flex items-stretch gap-1 self-stretch'>
           <Action
             type='submit'
             styleType={ActionStyleTypes.Solid | ActionStyleTypes.Thin}
             intentType={actionIntentType}
             disabled={isDisabled}
-            class='text-xs px-3'
+            class='px-3 h-full flex items-center justify-center'
             title='Send'
           >
             {sendIcon}
           </Action>
 
-          {onReset && (
+          {showResetAction && onReset && (
             <Action
               type='button'
               onClick={handleOpenResetConfirm}
               styleType={ActionStyleTypes.Solid | ActionStyleTypes.Thin}
               intentType={IntentTypes.Primary}
               disabled={isDisabled}
-              class='text-xs px-3'
+              class='px-3 h-full flex items-center justify-center'
               title='Reset Chat'
             >
               {redoIcon}
@@ -152,7 +152,7 @@ export function AziChatInput({
         </div>
       </form>
 
-      {showResetConfirm && (
+      {showResetAction && onReset && showResetConfirm && (
         <Modal title='Reset Azi Chat' onClose={handleCloseResetConfirm}>
           <div class='space-y-6'>
             <p class='text-sm text-slate-200'>Are you sure you want to reset this Azi chat?</p>

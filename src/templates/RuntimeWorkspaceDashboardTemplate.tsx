@@ -111,6 +111,7 @@ export function RuntimeWorkspaceDashboardTemplate({
             intentType={IntentTypes.Primary}
             onClick={() => setAziExpanded(!aziExpanded)}
             class='-:absolute -:top-0 -:right-0 -:z-30'
+            style='top:8px;'
           >
             {aziExpanded ? <CloseIcon class='w-5 h-5' /> : <ExpandIcon class='w-5 h-5' />}
           </Action>
