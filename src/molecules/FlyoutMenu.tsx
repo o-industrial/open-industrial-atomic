@@ -62,7 +62,8 @@ export function FlyoutMenu({
       ref={ref}
       role='menu'
       class={classSet([
-        '-:absolute -:z-50 -:min-w-44 -:bg-neutral-900 -:border -:border-neutral-800 -:rounded-md -:shadow-lg',
+        '-:absolute -:z-50 -:bg-neutral-900 -:border -:border-neutral-800 -:rounded-md -:shadow-lg',
+        '-:flex -:flex-col -:items-stretch -:w-fit -:min-w-60 -:max-w-sm',
         '-:py-1 -:text-sm',
         level === 0 ? '-:mt-2' : '-:ml-0',
       ])}
@@ -90,7 +91,7 @@ export function FlyoutMenu({
             disabled={item.disabled}
             onClick={() => !item.disabled && onPick(item)}
             class={classSet([
-              '-:w-full -:px-3 -:py-1.5 -:flex -:items-center -:gap-2 -:text-left',
+              '-:px-3 -:py-1.5 -:flex -:items-center -:gap-2 -:text-left',
               item.disabled ? '-:text-neutral-600' : '-:hover:bg-neutral-800 -:text-neutral-200',
             ])}
           >
