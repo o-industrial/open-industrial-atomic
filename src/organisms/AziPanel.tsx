@@ -124,13 +124,23 @@ export function AziPanel({
 
   // Track when the initial peek has completed
   const hasPeekedRef = useRef(false);
+  const extraInputsRef = useRef(extraInputs);
+  const peekRef = useRef(peek);
+
+  useEffect(() => {
+    extraInputsRef.current = extraInputs;
+  }, [extraInputs]);
+
+  useEffect(() => {
+    peekRef.current = peek;
+  }, [peek]);
 
   // Initial peek when mounted (and mark completion)
   useEffect(() => {
     console.log('[AziPanel] Initial peek()');
     (async () => {
       try {
-        await peek();
+        await peekRef.current(extraInputsRef.current);
       } finally {
         hasPeekedRef.current = true;
       }
