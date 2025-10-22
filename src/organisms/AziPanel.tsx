@@ -116,6 +116,7 @@ export function AziPanel({
     peek,
     scrollRef,
     registerStreamAnchor,
+    stop,
   } = workspaceMgr.UseAzi(aziMgr);
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -123,13 +124,23 @@ export function AziPanel({
 
   // Track when the initial peek has completed
   const hasPeekedRef = useRef(false);
+  const extraInputsRef = useRef(extraInputs);
+  const peekRef = useRef(peek);
+
+  useEffect(() => {
+    extraInputsRef.current = extraInputs;
+  }, [extraInputs]);
+
+  useEffect(() => {
+    peekRef.current = peek;
+  }, [peek]);
 
   // Initial peek when mounted (and mark completion)
   useEffect(() => {
     console.log('[AziPanel] Initial peek()');
     (async () => {
       try {
-        await peek();
+        await peekRef.current(extraInputsRef.current);
       } finally {
         hasPeekedRef.current = true;
       }
@@ -149,9 +160,11 @@ export function AziPanel({
   const wrappedSend = useCallback(
     async (...args: Parameters<typeof send>) => {
       onStartSend?.(stateRef.current);
-      const result = await send(...args); // run the real send
-      onFinishSend?.(stateRef.current); // call your callback afterwards
-      return result; // preserve return value
+      try {
+        return await send(...args);
+      } finally {
+        onFinishSend?.(stateRef.current);
+      }
     },
     [send, onStartSend, onFinishSend],
   );
@@ -164,9 +177,9 @@ export function AziPanel({
     if ((state.Messages?.length ?? 0) === 0 && !isSending) {
       autoGreetSentRef.current = true;
       console.log('[AziPanel] No messages after peek – sending empty message');
-      send('', extraInputs);
+      wrappedSend('', extraInputs);
     }
-  }, [state, isSending]);
+  }, [state, isSending, wrappedSend, extraInputs]);
 
   const resolveRole = (msg: unknown): Role => {
     if (msg instanceof HumanMessage || msg instanceof HumanMessageChunk) {
@@ -297,9 +310,11 @@ export function AziPanel({
           <AziChatInput
             onSend={wrappedSend}
             extraInputs={extraInputs}
-            disabled={isSending || isResetting}
+            disabled={isResetting}
             onReset={handleReset}
             showResetAction={false}
+            isStreaming={isSending}
+            onStop={stop}
           />
         }
       >
