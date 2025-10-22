@@ -146,30 +146,32 @@ export function AziChatInput({
         />
 
         <div class='flex items-stretch gap-1 self-stretch'>
-          {isStreaming ? (
-            <Action
-              type='button'
-              onClick={() => onStop?.()}
-              styleType={ActionStyleTypes.Solid | ActionStyleTypes.Thin}
-              intentType={IntentTypes.Secondary}
-              disabled={stopDisabled}
-              class='px-3 h-full flex items-center justify-center'
-              title='Stop'
-            >
-              <EmptyIcon class='w-5 h-5' />
-            </Action>
-          ) : (
-            <Action
-              type='submit'
-              styleType={ActionStyleTypes.Solid | ActionStyleTypes.Thin}
-              intentType={actionIntentType}
-              disabled={sendDisabled}
-              class='px-3 h-full flex items-center justify-center'
-              title='Send'
-            >
-              {sendIcon}
-            </Action>
-          )}
+          {isStreaming
+            ? (
+              <Action
+                type='button'
+                onClick={() => onStop?.()}
+                styleType={ActionStyleTypes.Solid | ActionStyleTypes.Thin}
+                intentType={IntentTypes.Secondary}
+                disabled={stopDisabled}
+                class='px-3 h-full flex items-center justify-center'
+                title='Stop'
+              >
+                <EmptyIcon class='w-5 h-5' />
+              </Action>
+            )
+            : (
+              <Action
+                type='submit'
+                styleType={ActionStyleTypes.Solid | ActionStyleTypes.Thin}
+                intentType={actionIntentType}
+                disabled={sendDisabled}
+                class='px-3 h-full flex items-center justify-center'
+                title='Send'
+              >
+                {sendIcon}
+              </Action>
+            )}
 
           {showResetAction && onReset && (
             <Action
