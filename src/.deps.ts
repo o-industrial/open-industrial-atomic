@@ -52,6 +52,8 @@ export {
   type FunctionalComponent,
   type JSX,
   type Ref,
+  toChildArray,
+  type VNode,
 } from 'npm:preact@10.20.1';
 export {
   type MutableRef,
