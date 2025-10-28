@@ -1,12 +1,10 @@
 import {
   classSet,
   ComponentChildren,
-  createPortal,
   ForwardedRef,
   forwardRef,
   FunctionalComponent,
   IntentTypes,
-  IS_BROWSER,
   JSX,
   Ref,
   toChildArray,
@@ -65,13 +63,6 @@ type InternalSelectOption = {
   value: string;
   labelLower: string;
   valueLower: string;
-};
-
-type ListboxPosition = {
-  top: number;
-  left: number;
-  width: number;
-  maxHeight: number;
 };
 
 function isOptionVNode(
@@ -157,7 +148,6 @@ export const Select: FunctionalComponent<
   const inputRef = useRef<HTMLInputElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const isMultiple = Boolean((selectProps as { multiple?: boolean }).multiple);
-  const [listboxPosition, setListboxPosition] = useState<ListboxPosition | null>(null);
 
   const normalizedOptions = useMemo<InternalSelectOption[]>(() => {
     if (!searchable) return [];
@@ -205,6 +195,7 @@ export const Select: FunctionalComponent<
 
     const options = normalizedOptions.filter((option) => {
       const isDisabled = Boolean(option.element.props?.disabled);
+      const isSelectedOption = selectedValues.has(option.value);
       if (isDisabled && queryLower.length > 0) {
         return false;
       }
@@ -225,7 +216,11 @@ export const Select: FunctionalComponent<
         matchCount++;
       }
 
-      return isMatch;
+      if (isMatch || isSelectedOption) {
+        return true;
+      }
+
+      return false;
     });
 
     return { filteredOptions: options, hasMatches: matchCount > 0 };
@@ -446,52 +441,6 @@ export const Select: FunctionalComponent<
       : `${fallbackOptionIdBase}-option-${highlightedIndex}`
     : undefined;
 
-  useEffect(() => {
-    if (!IS_BROWSER) return;
-    if (!isOpen) {
-      setListboxPosition(null);
-      return;
-    }
-
-    const updatePosition = () => {
-      const input = inputRef.current;
-      if (!input) return;
-      const rect = input.getBoundingClientRect();
-      const viewportHeight = globalThis.innerHeight ?? 0;
-      const scrollX = globalThis.scrollX ?? 0;
-      const scrollY = globalThis.scrollY ?? 0;
-      const padding = 4;
-      const availableBelow = viewportHeight - rect.bottom - padding;
-      const availableAbove = rect.top - padding;
-      const shouldOpenAbove = availableBelow < 160 && availableAbove > availableBelow;
-      const usableSpace = shouldOpenAbove ? availableAbove : availableBelow;
-      const maxHeight = Math.max(160, Math.min(320, usableSpace > 0 ? usableSpace : 320));
-      const top = shouldOpenAbove
-        ? Math.max(scrollY + padding, rect.top + scrollY - maxHeight - padding)
-        : rect.bottom + scrollY + padding;
-
-      setListboxPosition({
-        top,
-        left: rect.left + scrollX,
-        width: rect.width,
-        maxHeight,
-      });
-    };
-
-    updatePosition();
-
-    const resizeListener = () => updatePosition();
-    const scrollListener = () => updatePosition();
-
-    globalThis.addEventListener('resize', resizeListener);
-    globalThis.addEventListener('scroll', scrollListener, true);
-
-    return () => {
-      globalThis.removeEventListener('resize', resizeListener);
-      globalThis.removeEventListener('scroll', scrollListener, true);
-    };
-  }, [isOpen]);
-
   const optionItems = filteredOptions.length
     ? filteredOptions.map((option, index) => {
       const isHighlighted = index === highlightedIndex;
@@ -537,46 +486,6 @@ export const Select: FunctionalComponent<
 
   const listboxBaseClasses =
     'overflow-y-auto rounded border border-neutral-700 bg-neutral-900 text-sm text-neutral-100 shadow-xl';
-  const listboxTarget = IS_BROWSER ? globalThis.document?.body ?? null : null;
-  let listboxContent: JSX.Element | null = null;
-
-  if (isOpen) {
-    if (IS_BROWSER && listboxPosition && listboxTarget) {
-      listboxContent = createPortal(
-        (
-          <div
-            id={listboxId}
-            role='listbox'
-            aria-multiselectable={isMultiple || undefined}
-            class={`absolute z-[2147483000] ${listboxBaseClasses}`}
-            style={{
-              top: `${listboxPosition.top}px`,
-              left: `${listboxPosition.left}px`,
-              width: `${listboxPosition.width}px`,
-              maxHeight: `${listboxPosition.maxHeight}px`,
-            }}
-          >
-            {optionItems}
-          </div>
-        ),
-        listboxTarget,
-      );
-    } else {
-      listboxContent = (
-        <div
-          id={listboxId}
-          role='listbox'
-          aria-multiselectable={isMultiple || undefined}
-          class={`absolute left-0 right-0 z-[2147483000] mt-1 ${listboxBaseClasses}`}
-          style={{
-            maxHeight: listboxPosition?.maxHeight ? `${listboxPosition.maxHeight}px` : '14rem',
-          }}
-        >
-          {optionItems}
-        </div>
-      );
-    }
-  }
 
   return (
     <div ref={wrapperRef} class={wrapperClass}>
@@ -651,7 +560,16 @@ export const Select: FunctionalComponent<
             >
               {renderedOptions}
             </select>
-            {listboxContent}
+            {isOpen && (
+              <div
+                id={listboxId}
+                role='listbox'
+                aria-multiselectable={isMultiple || undefined}
+                class={`absolute left-0 right-0 z-[2147483000] mt-1 max-h-56 ${listboxBaseClasses}`}
+              >
+                {optionItems}
+              </div>
+            )}
           </div>
         )
         : (
