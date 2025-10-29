@@ -1,4 +1,4 @@
-import { classSet, ComponentChildren, IntentTypes, JSX, useMemo } from '../.deps.ts';
+import { classSet, ComponentChildren, IntentTypes, JSX, useMemo, useRef } from '../.deps.ts';
 import { Action, ActionStyleTypes, CloseIcon, useEscapeKey, useFocusTrap } from '../.exports.ts';
 
 export type ModalProps = {
@@ -13,6 +13,7 @@ export function Modal(props: ModalProps): JSX.Element {
 
   useEscapeKey(onClose);
   const trapRef = useFocusTrap<HTMLDivElement>();
+  const shouldCloseRef = useRef(false);
 
   const {
     ['aria-labelledby']: ariaLabelledByProp,
@@ -40,7 +41,14 @@ export function Modal(props: ModalProps): JSX.Element {
     <div
       role='presentation'
       class='fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center'
-      onClick={onClose}
+      onPointerDown={(event: JSX.TargetedPointerEvent<HTMLDivElement>) => {
+        shouldCloseRef.current = event.target === event.currentTarget;
+      }}
+      onClick={(event: JSX.TargetedMouseEvent<HTMLDivElement>) => {
+        if (shouldCloseRef.current && event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
     >
       <div
         ref={trapRef}
